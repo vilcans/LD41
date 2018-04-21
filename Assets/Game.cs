@@ -7,6 +7,9 @@ public class Game : MonoBehaviour {
     public Transform playerTransform;
     public Transform visualTransform;
     public Transform rotator;
+    public SpriteRenderer arrowSprite;
+    public Gradient arrowColors;
+    public Gradient arrowColorsNoMove;
 
     private struct Direction {
         public Vector2Int deltaPosition;
@@ -46,11 +49,22 @@ public class Game : MonoBehaviour {
 
         Direction direction = Direction.directions[movementIndex];
 
-        float r = Mathf.Pow(beatFraction, 7);
-        rotator.rotation = Quaternion.AngleAxis((beatNumber - nextPossibleStepBeat + lastMoveDirection + r)  * -90, Vector3.forward);
+        if(beatNumber >= nextPossibleStepBeat) {
+            float r = Mathf.Pow(beatFraction, 7);
+            rotator.rotation = Quaternion.AngleAxis((beatNumber - nextPossibleStepBeat + lastMoveDirection + r) * -90, Vector3.forward);
+        }
+        else {
+            rotator.rotation = Quaternion.AngleAxis(lastMoveDirection * -90, Vector3.forward);
+        }
 
         bool canMove = roundedBeat >= nextPossibleStepBeat;
-        rotator.gameObject.SetActive(beatNumber >= nextPossibleStepBeat);
+        //rotator.gameObject.SetActive(beatNumber >= nextPossibleStepBeat);
+        if(canMove) {
+            arrowSprite.color = arrowColors.Evaluate(beatFraction);
+        }
+        else {
+            arrowSprite.color = arrowColorsNoMove.Evaluate(beatFraction);
+        }
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             playerPosition += direction.deltaPosition;
