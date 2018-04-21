@@ -4,6 +4,8 @@ public class Game : MonoBehaviour {
 
     public AudioSource music;
     public AudioSource moveSound;
+    public AudioSource outOfSyncSound;
+
     public Transform playerTransform;
     public Transform visualTransform;
     public Transform rotator;
@@ -80,12 +82,11 @@ public class Game : MonoBehaviour {
         }
 
         bool isReady = roundedBeat >= nextPossibleStepBeat;
-        //rotator.gameObject.SetActive(beatNumber >= nextPossibleStepBeat);
         if(isReady) {
             arrowSprite.color = arrowColors.Evaluate(beatFraction);
         }
         else {
-            arrowSprite.color = arrowColorsNoMove.Evaluate(beatFraction);
+            arrowSprite.color = arrowColorsNoMove.Evaluate(roundedBeat + 1 == nextPossibleStepBeat ? beatFraction : 0);
         }
 
         bool canMove = isReady && level.IsWalkable(playerPosition + direction.deltaPosition);
@@ -93,9 +94,13 @@ public class Game : MonoBehaviour {
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             playerPosition += direction.deltaPosition;
             moveSound.Play();
-            //float diff = beat - beatWithFraction;
-            //Debug.LogFormat("diff = {0}", diff);
-            nextPossibleStepBeat = roundedBeat + 1;
+            if(beatFraction <= .2f || beatFraction >= .9f) {
+                nextPossibleStepBeat = roundedBeat + 1;
+            }
+            else {
+                outOfSyncSound.Play();
+                nextPossibleStepBeat = roundedBeat + 2;
+            }
             lastMoveDirection = movementIndex;
         }
 
