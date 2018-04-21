@@ -49,9 +49,8 @@ public class Game : MonoBehaviour {
 
     public void NewLevel() {
         level.Create();
-        playerPosition = level.entryPoint;
+        playerPosition = level.map.entryPoint;
         cameraTransform.position = GridToWorldPosition(playerPosition) + cameraOffset;
-        Debug.LogFormat("entryPoint {0}", level.entryPoint);
     }
 
     public void Update() {
@@ -89,7 +88,9 @@ public class Game : MonoBehaviour {
             arrowSprite.color = arrowColorsNoMove.Evaluate(roundedBeat + 1 == nextPossibleStepBeat ? beatFraction : 0);
         }
 
-        bool canMove = isReady && level.IsWalkable(playerPosition + direction.deltaPosition);
+        Vector2Int moveDestination = playerPosition + direction.deltaPosition;
+        TileMap.Tile destinationTile = level.map.GetTile(moveDestination);
+        bool canMove = isReady && destinationTile == TileMap.Tile.Floor;
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             playerPosition += direction.deltaPosition;
