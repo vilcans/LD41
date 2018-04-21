@@ -6,9 +6,11 @@ public class TileMap {
 
     public Vector2Int entryPoint;
 
+    private int borderThickness;
+
     public enum Tile : byte {
-        Floor,
         Rock,
+        Floor,
     }
 
     private Tile[,] tiles;
@@ -48,8 +50,9 @@ public class TileMap {
     public static TileMap Generate() {
         TileMap map = new TileMap();
 
-        for(int row = 0; row < height; ++row) {
-            for(int column = 0; column < width; ++column) {
+        int border = 1;
+        for(int row = border; row < height - border; ++row) {
+            for(int column = border; column < width - border; ++column) {
                 Tile tile = (Tile)UnityEngine.Random.Range(0, 2);
                 map.tiles[row, column] = tile;
             }
@@ -79,7 +82,7 @@ public class TileMap {
             }
         }
 
-        map.entryPoint = map.FindOpenArea(2, 2, 20, 10);
+        map.entryPoint = map.FindOpenArea(border, border, width / 8, height - border * 2);
 
         return map;
     }
@@ -87,10 +90,10 @@ public class TileMap {
     private Vector2Int FindOpenArea(int lowCol, int lowRow, int highCol, int highRow) {
         Vector2Int best = Vector2Int.zero;
         float bestScore = -1;
-        for(int i = 0; i < 20; ++i) {
+        for(int i = 0; i < 10; ++i) {
             Vector2Int sq = new Vector2Int(
-                UnityEngine.Random.Range(lowRow, highRow),
-                UnityEngine.Random.Range(lowCol, highCol)
+                UnityEngine.Random.Range(lowCol, highCol),
+                UnityEngine.Random.Range(lowRow, highRow)
             );
             float w = CountNeighbors(sq, Tile.Floor);
             if(w > bestScore) {
