@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class TileMap {
     public const int width = 80;
@@ -8,9 +9,11 @@ public class TileMap {
 
     private int borderThickness;
 
+    [Flags]
     public enum Tile : byte {
-        Rock,
-        Floor,
+        Bedrock = 1,
+        Rock = 2,
+        Floor = 4,
     }
 
     private Tile[,] tiles;
@@ -51,9 +54,15 @@ public class TileMap {
         TileMap map = new TileMap();
 
         int border = 1;
-        for(int row = border; row < height - border; ++row) {
-            for(int column = border; column < width - border; ++column) {
-                Tile tile = (Tile)UnityEngine.Random.Range(0, 2);
+        for(int row = 0; row < height; ++row) {
+            for(int column = 0; column < width; ++column) {
+                Tile tile;
+                if(row < border || row >= height - border || column < border || column >= width - border) {
+                    tile = Tile.Bedrock;
+                }
+                else {
+                    tile = (Tile)(1 << UnityEngine.Random.Range(1, 3));
+                }
                 map.tiles[row, column] = tile;
             }
         }
@@ -63,12 +72,17 @@ public class TileMap {
             for(int row = 0; row < height; ++row) {
                 for(int column = 0; column < width; ++column) {
                     Tile tile = map.tiles[row, column];
-                    float w = map.CountNeighbors(new Vector2Int(column, row), tile);
-                    if(tile == Tile.Rock && w < .5f) {
+                    Vector2Int sq = new Vector2Int(column, row);
+                    if(tile == Tile.Rock && map.CountNeighbors(sq, Tile.Rock | Tile.Bedrock) < .5f) {
                         nextGeneration.tiles[row, column] = Tile.Floor;
                     }
-                    else if(tile == Tile.Floor && w < .5f) {
-                        nextGeneration.tiles[row, column] = Tile.Rock;
+                    else if(tile == Tile.Floor && map.CountNeighbors(sq, Tile.Floor) < .5f) {
+                        if(map.CountNeighbors(sq, Tile.Bedrock) > 0f) {
+                            nextGeneration.tiles[row, column] = Tile.Bedrock;
+                        }
+                        else {
+                            nextGeneration.tiles[row, column] = Tile.Rock;
+                        }
                     }
                     else {
                         nextGeneration.tiles[row, column] = tile;
@@ -104,13 +118,13 @@ public class TileMap {
         return best;
     }
 
-    private float CountNeighbors(Vector2Int square, Tile soughtTile) {
+    private float CountNeighbors(Vector2Int square, Tile soughtTilesMask) {
         float weight = 0;
         for(int y = -1; y <= 1; ++y) {
             for(int x = -1; x <= 1; ++x) {
                 Vector2Int p = square + new Vector2Int(x, y);
                 Tile neighbor = GetTile(p);
-                if(neighbor == soughtTile) {
+                if((neighbor & soughtTilesMask) != 0) {
                     weight += neighborWeights[y + 1, x + 1];
                 }
             }

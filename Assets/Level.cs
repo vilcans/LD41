@@ -3,6 +3,7 @@ using System;
 
 public class Level : MonoBehaviour {
 
+    public Sprite bedrockPrefab;
     public Sprite floorPrefab;
     public Sprite rockPrefab;
 
@@ -41,6 +42,9 @@ public class Level : MonoBehaviour {
 
         Sprite sprite;
         switch(tile) {
+            case TileMap.Tile.Bedrock:
+                sprite = bedrockPrefab;
+                break;
             case TileMap.Tile.Floor:
                 sprite = floorPrefab;
                 break;
