@@ -35,6 +35,14 @@ public class Level : MonoBehaviour {
         }
     }
 
+    public bool IsWalkable(Vector2Int square) {
+        if(square.x < 0 || square.x >= width || square.y < 0 || square.y >= height) {
+            return false;
+        }
+        Tile t = tiles[square.y, square.x];
+        return t == Tile.Floor;
+    }
+
     private GameObject CreateObject(Tile tile, Vector2Int square) {
         GameObject obj = new GameObject("Tile" + square);
         obj.transform.localPosition = Game.GridToWorldPosition(square);

@@ -65,14 +65,16 @@ public class Game : MonoBehaviour {
             rotator.rotation = Quaternion.AngleAxis(lastMoveDirection * -90, Vector3.forward);
         }
 
-        bool canMove = roundedBeat >= nextPossibleStepBeat;
+        bool isReady = roundedBeat >= nextPossibleStepBeat;
         //rotator.gameObject.SetActive(beatNumber >= nextPossibleStepBeat);
-        if(canMove) {
+        if(isReady) {
             arrowSprite.color = arrowColors.Evaluate(beatFraction);
         }
         else {
             arrowSprite.color = arrowColorsNoMove.Evaluate(beatFraction);
         }
+
+        bool canMove = isReady && level.IsWalkable(playerPosition + direction.deltaPosition);
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             playerPosition += direction.deltaPosition;
