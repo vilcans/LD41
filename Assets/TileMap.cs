@@ -97,6 +97,7 @@ public class TileMap {
         }
 
         map.entryPoint = map.FindOpenArea(border, border, width / 8, height - border * 2);
+        map.tiles[map.entryPoint.y, map.entryPoint.x] = Tile.Floor;
 
         return map;
     }
