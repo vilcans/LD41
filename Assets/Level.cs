@@ -15,9 +15,12 @@ public class Level : MonoBehaviour {
     }
 
     private Tile[,] tiles;
+    private Transform objectParent;
 
     public void Create() {
         tiles = GenerateTiles();
+
+        objectParent = new GameObject("Level").transform;
 
         for(int row = 0; row < height; ++row) {
             for(int column = 0; column < width; ++column) {
@@ -27,6 +30,19 @@ public class Level : MonoBehaviour {
             }
         }
     }
+
+    public void Destroy() {
+        Destroy(objectParent.gameObject);
+    }
+
+#if UNITY_EDITOR
+    public void Update() {
+        if(Input.GetKeyDown(KeyCode.Backspace)) {
+            Destroy();
+            Create();
+        }
+    }
+#endif
 
     public bool IsWalkable(Vector2Int square) {
         if(square.x < 0 || square.x >= width || square.y < 0 || square.y >= height) {
@@ -38,7 +54,9 @@ public class Level : MonoBehaviour {
 
     private GameObject CreateObject(Tile tile, Vector2Int square) {
         GameObject obj = new GameObject("Tile" + square);
-        obj.transform.localPosition = Game.GridToWorldPosition(square) + Vector3.forward;
+        Transform t = obj.transform;
+        t.SetParent(objectParent);
+        t.localPosition = Game.GridToWorldPosition(square) + Vector3.forward;
         obj.isStatic = true;
 
         Sprite sprite;
@@ -69,7 +87,7 @@ public class Level : MonoBehaviour {
         }
 
         Tile[,] nextGeneration = new Tile[height, width];
-        for(int generation = 0; generation < 3000; ++generation) {
+        for(int generation = 0; generation < 4; ++generation) {
             for(int row = 0; row < height; ++row) {
                 for(int column = 0; column < width; ++column) {
                     Tile tile = tiles[row, column];
