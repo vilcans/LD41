@@ -6,6 +6,7 @@ public class Level : MonoBehaviour {
     public Sprite bedrockPrefab;
     public Sprite floorPrefab;
     public Sprite rockPrefab;
+    public Sprite exitPrefab;
 
     private Transform objectParent;
     public TileMap map;
@@ -50,6 +51,9 @@ public class Level : MonoBehaviour {
                 break;
             case TileMap.Tile.Rock:
                 sprite = rockPrefab;
+                break;
+            case TileMap.Tile.Exit:
+                sprite = exitPrefab;
                 break;
             default:
                 throw new ApplicationException("Unhandled tile type: " + tile);

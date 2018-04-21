@@ -6,6 +6,7 @@ public class TileMap {
     public const int height = 48;
 
     public Vector2Int entryPoint;
+    public Vector2Int exitPoint;
 
     private int borderThickness;
 
@@ -14,6 +15,7 @@ public class TileMap {
         Bedrock = 1,
         Rock = 2,
         Floor = 4,
+        Exit = 8,
     }
 
     private Tile[,] tiles;
@@ -96,8 +98,11 @@ public class TileMap {
             }
         }
 
-        map.entryPoint = map.FindOpenArea(border, border, width / 8, height - border * 2);
+        map.entryPoint = map.FindOpenArea(border, border, width / 4, height - border);
         map.tiles[map.entryPoint.y, map.entryPoint.x] = Tile.Floor;
+
+        map.exitPoint = map.FindOpenArea(width - border - width / 4, border, width - width / 8, height - border);
+        map.tiles[map.exitPoint.y, map.exitPoint.x] = Tile.Exit;
 
         return map;
     }
