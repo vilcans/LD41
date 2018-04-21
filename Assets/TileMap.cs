@@ -1,9 +1,11 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class TileMap {
     public const int width = 80;
     public const int height = 48;
+    private const int border = 1;
 
     public Vector2Int entryPoint;
     public Vector2Int exitPoint;
@@ -52,10 +54,14 @@ public class TileMap {
         return tiles[square.y, square.x];
     }
 
+    public void SetTile(Vector2Int square, Tile tile) {
+        Assert.IsFalse(square.x < 0 || square.x >= width || square.y < 0 || square.y >= height);
+        tiles[square.y, square.x] = tile;
+    }
+
     public static TileMap Generate() {
         TileMap map = new TileMap();
 
-        int border = 1;
         for(int row = 0; row < height; ++row) {
             for(int column = 0; column < width; ++column) {
                 Tile tile;
@@ -98,13 +104,25 @@ public class TileMap {
             }
         }
 
-        map.entryPoint = map.FindOpenArea(border, border, width / 4, height - border);
-        map.tiles[map.entryPoint.y, map.entryPoint.x] = Tile.Floor;
-
-        map.exitPoint = map.FindOpenArea(width - border - width / 4, border, width - width / 8, height - border);
-        map.tiles[map.exitPoint.y, map.exitPoint.x] = Tile.Exit;
+        map.CreateEntryAndExit();
 
         return map;
+    }
+
+    private void CreateEntryAndExit() {
+        Vector2Int p1 = FindOpenArea(border, border, width / 4, height - border);
+        Vector2Int p2 = FindOpenArea(width - border - width / 4, border, width - width / 8, height - border);
+
+        if(UnityEngine.Random.value < .5) {
+            entryPoint = p1;
+            exitPoint = p2;
+        }
+        else {
+            entryPoint = p2;
+            exitPoint = p1;
+        }
+        SetTile(entryPoint, Tile.Floor);
+        SetTile(exitPoint, Tile.Exit);
     }
 
     private Vector2Int FindOpenArea(int lowCol, int lowRow, int highCol, int highRow) {
