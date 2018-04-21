@@ -29,23 +29,25 @@ public class Game : MonoBehaviour {
         samplesPerBeat = music.clip.frequency * 60 / bpm;
     }
 
-    public void FixedUpdate() {
+    public void Update() {
         int time = music.timeSamples;
         float beatWithFraction = time / samplesPerBeat;
         int beat = (int)beatWithFraction;
+        int roundedBeat = (int)(beatWithFraction + .1f);
         float timeInBeat = beatWithFraction - beat;
 
-        int index = beat % 4;
+        int index = roundedBeat % 4;
 
         Direction direction = Direction.directions[index];
 
         rotator.rotation = Quaternion.AngleAxis(index * -90, Vector3.forward);
 
-        if(Input.anyKeyDown) {
+        if(Input.GetKeyDown(KeyCode.Space) && lastStepBeat != roundedBeat) {
             playerPosition += direction.deltaPosition;
-            float diff = beat - beatWithFraction;
             moveSound.Play();
-            Debug.LogFormat("diff = {0}", diff);
+            //float diff = beat - beatWithFraction;
+            //Debug.LogFormat("diff = {0}", diff);
+            lastStepBeat = roundedBeat;
         }
 
         playerTransform.position = GridToWorldPosition(playerPosition);
