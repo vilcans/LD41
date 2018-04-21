@@ -13,6 +13,9 @@ public class Game : MonoBehaviour {
 
     public Level level;
 
+    private Transform cameraTransform;
+    private Vector3 cameraVelocity;
+
     private struct Direction {
         public Vector2Int deltaPosition;
 
@@ -35,6 +38,8 @@ public class Game : MonoBehaviour {
     private int indexOffset;
 
     public void Awake() {
+        cameraTransform = Camera.main.transform;
+
         samplesPerBeat = music.clip.frequency * 60 / bpm;
         level.Create();
     }
@@ -78,7 +83,9 @@ public class Game : MonoBehaviour {
             lastMoveDirection = movementIndex;
         }
 
-        playerTransform.position = GridToWorldPosition(playerPosition);
+        Vector3 position = GridToWorldPosition(playerPosition);
+        playerTransform.position = position;
+        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, position + Vector3.back, ref cameraVelocity, 1.0f);
         visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beatFraction + 1));
     }
 
