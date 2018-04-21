@@ -23,35 +23,46 @@ public class Game : MonoBehaviour {
 
     private Vector2Int playerPosition;
 
+    private int beatNumber;
+    private float beatFraction;
     private int lastStepBeat = -1;
+    private int lastMoveDirection = 0;
+    private int indexOffset;
 
     public void Awake() {
         samplesPerBeat = music.clip.frequency * 60 / bpm;
     }
 
     public void Update() {
-        int time = music.timeSamples;
-        float beatWithFraction = time / samplesPerBeat;
-        int beat = (int)beatWithFraction;
-        int roundedBeat = (int)(beatWithFraction + .1f);
-        float timeInBeat = beatWithFraction - beat;
+        float previousFraction = beatFraction;
+        float beatWithFraction = music.timeSamples / samplesPerBeat;
+        beatFraction = beatWithFraction - Mathf.Floor(beatWithFraction);
+        if(beatFraction < previousFraction) {
+            ++beatNumber;
+        }
 
-        int index = roundedBeat % 4;
+        int roundedBeat = (int)(beatNumber + beatFraction + .1f);
+
+        int index = (roundedBeat - lastStepBeat + lastMoveDirection + 3) % 4;
 
         Direction direction = Direction.directions[index];
 
         rotator.rotation = Quaternion.AngleAxis(index * -90, Vector3.forward);
 
-        if(Input.GetKeyDown(KeyCode.Space) && lastStepBeat != roundedBeat) {
+        bool canMove = lastStepBeat != roundedBeat;
+        rotator.gameObject.SetActive(canMove);
+
+        if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             playerPosition += direction.deltaPosition;
             moveSound.Play();
             //float diff = beat - beatWithFraction;
             //Debug.LogFormat("diff = {0}", diff);
             lastStepBeat = roundedBeat;
+            lastMoveDirection = index;
         }
 
         playerTransform.position = GridToWorldPosition(playerPosition);
-        visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (timeInBeat + 1));
+        visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beatFraction + 1));
     }
 
     private Vector3 GridToWorldPosition(Vector2Int p) {
