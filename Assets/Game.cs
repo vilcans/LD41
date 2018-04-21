@@ -15,6 +15,7 @@ public class Game : MonoBehaviour {
 
     private Transform cameraTransform;
     private Vector3 cameraVelocity;
+    private Vector3 cameraOffset = new Vector3(0, 0, -10);
 
     private struct Direction {
         public Vector2Int deltaPosition;
@@ -87,7 +88,7 @@ public class Game : MonoBehaviour {
 
         Vector3 position = GridToWorldPosition(playerPosition);
         playerTransform.position = position;
-        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, position + Vector3.back, ref cameraVelocity, 1.0f);
+        cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, position + cameraOffset, ref cameraVelocity, 1.0f);
         visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beatFraction + 1));
     }
 

@@ -45,7 +45,7 @@ public class Level : MonoBehaviour {
 
     private GameObject CreateObject(Tile tile, Vector2Int square) {
         GameObject obj = new GameObject("Tile" + square);
-        obj.transform.localPosition = Game.GridToWorldPosition(square);
+        obj.transform.localPosition = Game.GridToWorldPosition(square) + Vector3.forward;
         obj.isStatic = true;
 
         Sprite sprite;
