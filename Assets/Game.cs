@@ -3,6 +3,7 @@ using UnityEngine;
 public class Game : MonoBehaviour {
 
     public AudioSource music;
+    public AudioSource moveSound;
     public Transform playerTransform;
     public Transform visualTransform;
     public Transform rotator;
@@ -22,28 +23,33 @@ public class Game : MonoBehaviour {
 
     private Vector2Int playerPosition;
 
+    private int lastStepBeat = -1;
+
     public void Awake() {
         samplesPerBeat = music.clip.frequency * 60 / bpm;
     }
 
-    public void Update() {
+    public void FixedUpdate() {
         int time = music.timeSamples;
-        float beat = time / samplesPerBeat;
+        float beatWithFraction = time / samplesPerBeat;
+        int beat = (int)beatWithFraction;
+        float timeInBeat = beatWithFraction - beat;
 
-        int index = (int)(beat + .5) % 4;
+        int index = beat % 4;
 
         Direction direction = Direction.directions[index];
 
-        rotator.rotation = Quaternion.AngleAxis(-(int)(beat) * 90, Vector3.forward);
+        rotator.rotation = Quaternion.AngleAxis(index * -90, Vector3.forward);
 
         if(Input.anyKeyDown) {
             playerPosition += direction.deltaPosition;
-            float diff = (int)(beat) - beat;
+            float diff = beat - beatWithFraction;
+            moveSound.Play();
             Debug.LogFormat("diff = {0}", diff);
         }
 
         playerTransform.position = GridToWorldPosition(playerPosition);
-        visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beat - (int)beat + 1));
+        visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (timeInBeat + 1));
     }
 
     private Vector3 GridToWorldPosition(Vector2Int p) {
