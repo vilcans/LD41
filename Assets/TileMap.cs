@@ -10,8 +10,6 @@ public class TileMap {
     public Vector2Int entryPoint;
     public Vector2Int exitPoint;
 
-    private int borderThickness;
-
     [Flags]
     public enum Tile : byte {
         Bedrock = 1,
@@ -109,6 +107,22 @@ public class TileMap {
         return map;
     }
 
+    public float GetCost(Vector2Int square) {
+        Tile t = GetTile(square);
+        switch(t) {
+            case Tile.Bedrock:
+                return 1e9f;
+            case Tile.Rock:
+                return 1e6f;
+            default:
+                return 1;
+        }
+    }
+
+    public bool IsInBounds(Vector2Int square) {
+        return square.x >= 0 && square.x < width && square.y >= 0 && square.y < height;
+    }
+
     private void CreateEntryAndExit() {
         Vector2Int p1 = FindOpenArea(border, border, width / 4, height - border);
         Vector2Int p2 = FindOpenArea(width - border - width / 4, border, width - width / 8, height - border);
@@ -121,8 +135,59 @@ public class TileMap {
             entryPoint = p2;
             exitPoint = p1;
         }
+
+        // Pathfind from exit to entry
+        {
+            PathMap path = new PathMap(this);
+            path.StartSearch(entryPoint);
+            bool found = path.UpdateUntilPathFound(exitPoint);
+            //path.UpdateAll(); bool found = true;
+            if(found) {
+                //path.Print();
+                Vector2Int sq = exitPoint;
+                //Debug.LogFormat("Pathfinding from {0}", sq);
+                while(sq != entryPoint) {
+                    PathMap.Node node = path.nodes[sq.y, sq.x];
+                    //Debug.LogFormat("At {0}: cost {1} direction {2}", sq, node.cost, node.direction.GetCharacter());
+                    Vector3 worldPos = Game.GridToWorldPosition(sq);
+                    if(GetTile(sq) != Tile.Floor) {
+                        //Debug.LogFormat("Changing {0} from {1} to floor", sq, GetTile(sq));
+#if UNITY_EDITOR
+                        Debug.DrawLine(worldPos + new Vector3(-.5f, -.5f, 0), worldPos + new Vector3(.5f, .5f, 0), Color.red, 5);
+#endif
+                        SetTile(sq, Tile.Floor);
+                    }
+                    Assert.IsTrue(node.direction.deltaPosition.sqrMagnitude != 0);
+                    sq += node.direction.GetOpposite().deltaPosition;
+#if UNITY_EDITOR
+                    Debug.DrawLine(worldPos, Game.GridToWorldPosition(sq), Color.green, 5);
+#endif
+                }
+            }
+            else {
+                Debug.LogWarning("No path found from entry to exit - creating a corridor");
+                MakeCorridor(entryPoint, exitPoint, Tile.Bedrock);
+            }
+        }
+
+
         SetTile(entryPoint, Tile.Floor);
         SetTile(exitPoint, Tile.Exit);
+    }
+
+    private void MakeCorridor(Vector2Int a, Vector2Int b, Tile tile) {
+        if(a.x > b.x) {
+            var tmp = a;
+            a = b;
+            b = tmp;
+        }
+        for(int x = a.x; x <= b.x; ++x) {
+            tiles[a.y, x] = tile;
+        }
+        int endY = Math.Max(a.y, b.y);
+        for(int y = Math.Min(a.y, b.y); y <= endY; ++y) {
+            tiles[y, b.x] = tile;
+        }
     }
 
     private Vector2Int FindOpenArea(int lowCol, int lowRow, int highCol, int highRow) {

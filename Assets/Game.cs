@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Game : MonoBehaviour {
 
@@ -19,14 +21,36 @@ public class Game : MonoBehaviour {
     private Vector3 cameraVelocity;
     private Vector3 cameraOffset = new Vector3(0, 0, -10);
 
-    private struct Direction {
+    public struct Direction {
         public Vector2Int deltaPosition;
 
         public static Direction up = new Direction { deltaPosition = new Vector2Int(0, 1) };
         public static Direction right = new Direction { deltaPosition = new Vector2Int(1, 0) };
         public static Direction down = new Direction { deltaPosition = new Vector2Int(0, -1) };
         public static Direction left = new Direction { deltaPosition = new Vector2Int(-1, 0) };
+
         public static Direction[] directions = { up, right, down, left };
+
+        public Direction GetOpposite() {
+            return new Direction { deltaPosition = deltaPosition * -1 };
+        }
+
+        public char GetCharacter() {
+            if(deltaPosition == up.deltaPosition) {
+                return '^';
+            }
+            if(deltaPosition == right.deltaPosition) {
+                return '>';
+            }
+            if(deltaPosition == down.deltaPosition) {
+                return 'v';
+            }
+            if(deltaPosition == left.deltaPosition) {
+                return '<';
+            }
+            Assert.IsTrue(false, "Unknown Direction: " + this);
+            return '?';
+        }
     }
 
     private float bpm = 120;
