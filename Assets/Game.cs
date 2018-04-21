@@ -25,7 +25,7 @@ public class Game : MonoBehaviour {
 
     private int beatNumber;
     private float beatFraction;
-    private int lastStepBeat = -1;
+    private int nextPossibleStepBeat = 0;
     private int lastMoveDirection = 0;
     private int indexOffset;
 
@@ -42,23 +42,23 @@ public class Game : MonoBehaviour {
         }
 
         int roundedBeat = (int)(beatNumber + beatFraction + .1f);
+        int movementIndex = (roundedBeat - nextPossibleStepBeat + lastMoveDirection + 4) % 4;
 
-        int index = (roundedBeat - lastStepBeat + lastMoveDirection + 3) % 4;
+        Direction direction = Direction.directions[movementIndex];
 
-        Direction direction = Direction.directions[index];
+        float r = Mathf.Pow(beatFraction, 7);
+        rotator.rotation = Quaternion.AngleAxis((beatNumber - nextPossibleStepBeat + lastMoveDirection + r)  * -90, Vector3.forward);
 
-        rotator.rotation = Quaternion.AngleAxis(index * -90, Vector3.forward);
-
-        bool canMove = lastStepBeat != roundedBeat;
-        rotator.gameObject.SetActive(canMove);
+        bool canMove = roundedBeat >= nextPossibleStepBeat;
+        rotator.gameObject.SetActive(beatNumber >= nextPossibleStepBeat);
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             playerPosition += direction.deltaPosition;
             moveSound.Play();
             //float diff = beat - beatWithFraction;
             //Debug.LogFormat("diff = {0}", diff);
-            lastStepBeat = roundedBeat;
-            lastMoveDirection = index;
+            nextPossibleStepBeat = roundedBeat + 1;
+            lastMoveDirection = movementIndex;
         }
 
         playerTransform.position = GridToWorldPosition(playerPosition);
