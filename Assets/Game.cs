@@ -42,10 +42,23 @@ public class Game : MonoBehaviour {
         cameraTransform = Camera.main.transform;
 
         samplesPerBeat = music.clip.frequency * 60 / bpm;
+        NewLevel();
+    }
+
+    public void NewLevel() {
         level.Create();
+        playerPosition = level.entryPoint;
+        cameraTransform.position = GridToWorldPosition(playerPosition) + cameraOffset;
+        Debug.LogFormat("entryPoint {0}", level.entryPoint);
     }
 
     public void Update() {
+#if UNITY_EDITOR
+        if(Input.GetKeyDown(KeyCode.Backspace)) {
+            NewLevel();
+        }
+#endif
+
         float previousFraction = beatFraction;
         float beatWithFraction = music.timeSamples / samplesPerBeat;
         beatFraction = beatWithFraction - Mathf.Floor(beatWithFraction);

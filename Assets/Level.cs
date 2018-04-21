@@ -3,11 +3,14 @@ using System;
 
 public class Level : MonoBehaviour {
 
-    public const int width = 40;
-    public const int height = 24;
+    public const int width = 80;
+    public const int height = 48;
 
     public Sprite floorPrefab;
     public Sprite rockPrefab;
+
+    [NonSerialized]
+    public Vector2Int entryPoint;
 
     public enum Tile : byte {
         Floor,
@@ -40,7 +43,11 @@ public class Level : MonoBehaviour {
 
 
     public void Create() {
-        tiles = GenerateTiles();
+        if(objectParent != null) {
+            Destroy();
+        }
+
+        Generate();
 
         objectParent = new GameObject("Level").transform;
 
@@ -55,16 +62,8 @@ public class Level : MonoBehaviour {
 
     public void Destroy() {
         Destroy(objectParent.gameObject);
+        objectParent = null;
     }
-
-#if UNITY_EDITOR
-    public void Update() {
-        if(Input.GetKeyDown(KeyCode.Backspace)) {
-            Destroy();
-            Create();
-        }
-    }
-#endif
 
     public bool IsWalkable(Vector2Int square) {
         if(square.x < 0 || square.x >= width || square.y < 0 || square.y >= height) {
@@ -97,8 +96,8 @@ public class Level : MonoBehaviour {
         return obj;
     }
 
-    private static Tile[,] GenerateTiles() {
-        Tile[,] tiles = new Tile[height, width];
+    private void Generate() {
+        tiles = new Tile[height, width];
 
         for(int row = 0; row < height; ++row) {
             for(int column = 0; column < width; ++column) {
@@ -132,7 +131,24 @@ public class Level : MonoBehaviour {
             }
         }
 
-        return tiles;
+        entryPoint = FindOpenArea(2, 2, 20, 10);
+    }
+
+    private Vector2Int FindOpenArea(int lowCol, int lowRow, int highCol, int highRow) {
+        Vector2Int best = Vector2Int.zero;
+        float bestScore = -1;
+        for(int i = 0; i < 20; ++i) {
+            Vector2Int sq = new Vector2Int(
+                UnityEngine.Random.Range(lowRow, highRow),
+                UnityEngine.Random.Range(lowCol, highCol)
+            );
+            float w = CountNeighbors(tiles, sq, Tile.Floor);
+            if(w > bestScore) {
+                bestScore = w;
+                best = sq;
+            }
+        }
+        return best;
     }
 
     private static float CountNeighbors(Tile[,] tiles, Vector2Int square, Tile soughtTile) {
