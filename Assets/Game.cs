@@ -11,6 +11,8 @@ public class Game : MonoBehaviour {
     public Gradient arrowColors;
     public Gradient arrowColorsNoMove;
 
+    public Level level;
+
     private struct Direction {
         public Vector2Int deltaPosition;
 
@@ -34,6 +36,7 @@ public class Game : MonoBehaviour {
 
     public void Awake() {
         samplesPerBeat = music.clip.frequency * 60 / bpm;
+        level.Create();
     }
 
     public void Update() {
@@ -79,7 +82,7 @@ public class Game : MonoBehaviour {
         visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beatFraction + 1));
     }
 
-    private Vector3 GridToWorldPosition(Vector2Int p) {
+    public static Vector3 GridToWorldPosition(Vector2Int p) {
         return new Vector3(p.x, p.y, 0);
     }
 }
