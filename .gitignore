@@ -22,6 +22,7 @@ sysinfo.txt
 *.sln
 *.CSharp.csproj
 .vs/
+obj/
 
 # ============ #
 # OS generated #
