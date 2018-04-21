@@ -17,6 +17,28 @@ public class Level : MonoBehaviour {
     private Tile[,] tiles;
     private Transform objectParent;
 
+    private static float[,] neighborWeights = new float[3, 3] {
+        { 1, 2, 1 },
+        { 2, 0, 2 },
+        { 1, 2, 1 },
+    };
+
+    static Level() {
+        float total = 0;
+        int size = neighborWeights.GetLength(0);
+        for(int row = 0; row < size; ++row) {
+            for(int col = 0; col < size; ++col) {
+                total += neighborWeights[row, col];
+            }
+        }
+        for(int row = 0; row < size; ++row) {
+            for(int col = 0; col < size; ++col) {
+                neighborWeights[row, col] /= total;
+            }
+        }
+    }
+
+
     public void Create() {
         tiles = GenerateTiles();
 
@@ -91,11 +113,11 @@ public class Level : MonoBehaviour {
             for(int row = 0; row < height; ++row) {
                 for(int column = 0; column < width; ++column) {
                     Tile tile = tiles[row, column];
-                    int neighbors = CountNeighbors(tiles, new Vector2Int(column, row), tile);
-                    if(tile == Tile.Rock && neighbors < 2) {
+                    float w = CountNeighbors(tiles, new Vector2Int(column, row), tile);
+                    if(tile == Tile.Rock && w < .5f) {
                         nextGeneration[row, column] = Tile.Floor;
                     }
-                    else if(tile == Tile.Floor && neighbors < 2) {
+                    else if(tile == Tile.Floor && w < .5f) {
                         nextGeneration[row, column] = Tile.Rock;
                     }
                     else {
@@ -113,12 +135,16 @@ public class Level : MonoBehaviour {
         return tiles;
     }
 
-    private static int CountNeighbors(Tile[,] tiles, Vector2Int square, Tile soughtTile) {
-        int neighbors = 0;
-        if(square.x >= 1 && tiles[square.y, square.x - 1] == soughtTile) { ++neighbors; }
-        if(square.x < width - 1 && tiles[square.y, square.x + 1] == soughtTile) { ++neighbors; }
-        if(square.y >= 1 && tiles[square.y - 1, square.x] == soughtTile) { ++neighbors; }
-        if(square.y < height - 1 && tiles[square.y + 1, square.x] == soughtTile) { ++neighbors; }
-        return neighbors;
+    private static float CountNeighbors(Tile[,] tiles, Vector2Int square, Tile soughtTile) {
+        float weight = 0;
+        for(int y = -1; y <= 1; ++y) {
+            for(int x = -1; x <= 1; ++x) {
+                Vector2Int p = square + new Vector2Int(x, y);
+                if(p.x >= 0 && p.x < width && p.y >= 0 && p.y < height && tiles[p.y, p.x] == soughtTile) {
+                    weight += neighborWeights[y + 1, x + 1];
+                }
+            }
+        }
+        return weight;
     }
 }
