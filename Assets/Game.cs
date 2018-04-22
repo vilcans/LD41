@@ -17,6 +17,12 @@ public class Game : MonoBehaviour {
 
     public Level level;
 
+    private enum State {
+        EnteringLevel,
+        Playing,
+    }
+    private State state;
+
     private Transform cameraTransform;
     private Vector3 cameraVelocity;
     private Vector3 cameraOffset = new Vector3(0, 0, -10);
@@ -75,9 +81,15 @@ public class Game : MonoBehaviour {
         level.Create();
         playerPosition = level.map.entryPoint;
         cameraTransform.position = GridToWorldPosition(playerPosition) + cameraOffset;
+        state = State.EnteringLevel;
     }
 
     public void Update() {
+        if(state == State.EnteringLevel) {
+            state = State.Playing;
+            return;
+        }
+
 #if UNITY_EDITOR
         if(Input.GetKeyDown(KeyCode.Backspace)) {
             NewLevel();
@@ -112,9 +124,14 @@ public class Game : MonoBehaviour {
             arrowSprite.color = arrowColorsNoMove.Evaluate(roundedBeat + 1 == nextPossibleStepBeat ? beatFraction : 0);
         }
 
+        if(isReady && level.map.GetTile(playerPosition) == TileMap.Tile.Exit) {
+            NewLevel();
+            return;
+        }
+
         Vector2Int moveDestination = playerPosition + direction.deltaPosition;
         TileMap.Tile destinationTile = level.map.GetTile(moveDestination);
-        bool canMove = isReady && destinationTile == TileMap.Tile.Floor;
+        bool canMove = isReady && ((destinationTile & (TileMap.Tile.Floor | TileMap.Tile.Exit)) != 0);
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             playerPosition += direction.deltaPosition;
