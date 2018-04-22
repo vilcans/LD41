@@ -97,7 +97,7 @@ public class Level {
                     return;
                 }
                 square = new Vector2Int(Random.Range(TileMap.border, map.width - TileMap.border), Random.Range(TileMap.border, map.height - TileMap.border));
-            } while(map.GetTile(square) != TileMap.Tile.Floor);
+            } while(!IsFree(square));
 
             Creature creature = new Creature {
                 square = square,
@@ -106,6 +106,18 @@ public class Level {
             };
             creatures.Add(creature);
         }
+    }
+
+    private bool IsFree(Vector2Int square) {
+        if(map.GetTile(square) != TileMap.Tile.Floor) {
+            return false;
+        }
+        for(int i = 0, len = creatures.Count; i < len; ++i) {
+            if(creatures[i].square == square) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void TickBeat() {
