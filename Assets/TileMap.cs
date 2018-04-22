@@ -6,10 +6,12 @@ public class TileMap {
     public readonly int width;
     public readonly int height;
 
-    private const int border = 1;
+    public const int border = 1;
 
     public Vector2Int entryPoint;
     public Vector2Int exitPoint;
+
+    public PathMap pathToPlayer;
 
     [Flags]
     public enum Tile : byte {
@@ -161,7 +163,7 @@ public class TileMap {
         // Pathfind from exit to entry
         {
             PathMap path = new PathMap(this);
-            path.StartSearch(entryPoint);
+            path.StartSearch(entryPoint, Mathf.Infinity);
             bool found = path.UpdateUntilPathFound(exitPoint);
             //path.UpdateAll(); bool found = true;
             if(found) {
@@ -190,6 +192,9 @@ public class TileMap {
                 Debug.LogWarning("No path found from entry to exit - creating a corridor");
                 MakeCorridor(entryPoint, exitPoint, Tile.Bedrock);
             }
+
+            pathToPlayer = path;
+            pathToPlayer.Clear();
         }
 
 

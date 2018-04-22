@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
 public class PathMap {
 
     public TileMap map;
     public int updatesPerTick = 50;
 
-    private Vector2Int targetSquare;
+    private Vector2Int targetSquare = new Vector2Int(-9999, -9999);
 
     private int height;
     private int width;
+
+    private float maxCost = Mathf.Infinity;
 
     private struct PathItem {
         public Vector2Int square;
@@ -45,7 +48,7 @@ public class PathMap {
         Clear();
     }
 
-    void Clear() {
+    public void Clear() {
         for(var row = 0; row < height; ++row) {
             for(var col = 0; col < width; ++col) {
                 nodes[row, col] = new Node {
@@ -106,7 +109,19 @@ public class PathMap {
         UpdateAroundTile(square, node.cost);
     }
 
-    public void StartSearch(Vector2Int target) {
+    public void StartSearch(Vector2Int target, float maxCost) {
+        this.maxCost = maxCost;
+        if(target == targetSquare) {
+            return;
+        }
+        for(var row = 0; row < height; ++row) {
+            for(var col = 0; col < width; ++col) {
+                Node node = nodes[row, col];
+                node.cost = Mathf.Infinity;
+                nodes[row, col] = node;
+            }
+        }
+        path.Clear();
         targetSquare = target;
         path.Enqueue(new PathItem(targetSquare, Game.Direction.left, 0));
     }
@@ -168,7 +183,7 @@ public class PathMap {
                 continue;
             }
             float newCost = tileCost + map.GetCost(newSq);
-            if(nodes[newSq.y, newSq.x].cost > newCost) {
+            if(newCost < maxCost && nodes[newSq.y, newSq.x].cost > newCost) {
                 PathItem newItem = new PathItem(newSq, direction, newCost);
                 path.Enqueue(newItem);
             }
@@ -195,4 +210,32 @@ public class PathMap {
             Debug.Log(s.ToString());
         }
     }
+
+#if UNITY_EDITOR
+    public void DebugDraw() {
+        for(int row = 0; row < height; ++row) {
+            for(int col = 0; col < width; ++col) {
+                StringBuilder s = new StringBuilder();
+                Node node = nodes[row, col];
+                float w = node.cost;
+                if(w >= 99.9f) {
+                    s.Append("  99.9");
+                }
+                else {
+                    s.AppendFormat("{0,5:F1}", w);
+                }
+                s.Append(node.direction.GetCharacter());
+
+                Vector3 worldPos = Game.GridToWorldPosition(new Vector2Int(col, row));
+                //Handles.Label(worldPos, s.ToString());
+                Vector3 deltaPosition = new Vector3(
+                    node.direction.deltaPosition.x * -.45f,
+                    node.direction.deltaPosition.y * -.45f,
+                    0
+                );
+                Debug.DrawLine(worldPos, worldPos + deltaPosition);
+            }
+        }
+    }
+#endif
 }

@@ -153,6 +153,10 @@ public class Game : MonoBehaviour {
     }
 
     public void Update() {
+#if UNITY_EDITOR
+        level.DebugDraw();
+#endif
+
         if(Input.GetKeyDown(KeyCode.R)) {
             SceneManager.LoadScene("Main");
         }
@@ -243,6 +247,9 @@ public class Game : MonoBehaviour {
         playerTransform.position = position;
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, position + cameraOffset, ref cameraVelocity, 1.0f);
         visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beatFraction + 1));
+
+        level.map.pathToPlayer.StartSearch(playerPosition, 10.0f);
+        level.map.pathToPlayer.Tick();
     }
 
     public static Vector3 GridToWorldPosition(Vector2Int p) {

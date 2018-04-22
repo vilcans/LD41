@@ -1,8 +1,16 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Level {
 
+    public class Creature {
+        public Vector2Int square;
+        public GameObject gameObject;
+    }
+
     public TileMap map;
+
+    public List<Creature> creatures;
 
     public Level(int depth) {
 
@@ -54,11 +62,51 @@ public class Level {
             }
         }
 
+        int numberOfCreatures;
+        /*if(level < 2) {
+            numberOfCreatures = 0;
+        }*/
+        numberOfCreatures = 1;
+
         Debug.LogFormat("Iterations={0}", iterations);
         map = TileMap.Generate(
             new Vector2Int(width, height),
             iterations,
             neighborWeights
         );
+
+        creatures = new List<Creature>(numberOfCreatures);
+        SpawnCreatures(numberOfCreatures);
     }
+
+    private void SpawnCreatures(int numberOfCreatures) {
+        int retries = 0;
+        for(int i = 0; i < numberOfCreatures; ++i) {
+            Vector2Int square;
+            do {
+                if(++retries > 10) {
+                    Debug.Log("Could not spawn all creatures: no space found");
+                    return;
+                }
+                square = new Vector2Int(Random.Range(TileMap.border, map.width - TileMap.border), Random.Range(TileMap.border, map.height - TileMap.border));
+            } while(map.GetTile(square) != TileMap.Tile.Floor);
+
+            Creature creature = new Creature {
+                square = square,
+            };
+            creatures.Add(creature);
+        }
+    }
+
+#if UNITY_EDITOR
+    public void DebugDraw() {
+        for(int i = 0, len = creatures.Count; i < len; ++i) {
+            Creature creature = creatures[i];
+            Vector3 worldPos = Game.GridToWorldPosition(creature.square);
+            Debug.DrawLine(worldPos + new Vector3(-.5f, -.5f, 0), worldPos + new Vector3(.5f,  .5f, 0), Color.yellow);
+            Debug.DrawLine(worldPos + new Vector3(-.5f,  .5f, 0), worldPos + new Vector3(.5f, -.5f, 0), Color.yellow);
+        }
+        map.pathToPlayer.DebugDraw();
+    }
+#endif
 }
