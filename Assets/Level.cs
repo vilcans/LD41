@@ -8,13 +8,19 @@ public class Level {
 
         //Random.InitState(depth);
 
-        Vector2Int size;
-        if(depth < 5) {
-            size = new Vector2Int(40, 24);
+        bool small = depth < 5;
+
+        int width;
+        int height;
+        if(small) {
+            width = Random.Range(30, 50);
+            height = (40 * 24) / width;
         }
         else {
-            size = new Vector2Int(60, 32);
+            width = Random.Range(50, 70);
+            height = (60 * 32) / width;
         }
-        map = TileMap.Generate(size);
+
+        map = TileMap.Generate(new Vector2Int(width, height));
     }
 }
