@@ -338,10 +338,17 @@ public class Game : MonoBehaviour {
 
 
     private void AddHunger(int points) {
+        int oldHunger = hunger;
         hunger += points;
         if(hunger > maxHunger) {
+            AddMessage("You are starving");
             AddDamage(hunger - maxHunger, "starvation");
             hunger = maxHunger;
+        }
+        else {
+            if(hunger >= 40 && oldHunger / 20 != hunger / 20) {
+                AddMessage("You are hungry");
+            }
         }
         UpdateStatusText();
     }
