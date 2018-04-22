@@ -6,6 +6,14 @@ public class Level {
     public class Creature {
         public Vector2Int square;
         public GameObject gameObject;
+
+        // If the cost for going to the player is less than this, will attack
+        public float aggressivity;
+
+        // How old trace this creature will follow
+        public int memory;
+
+        public bool inPursuit;
     }
 
     public TileMap map;
@@ -93,6 +101,8 @@ public class Level {
 
             Creature creature = new Creature {
                 square = square,
+                aggressivity = 10,
+                memory = 5,
             };
             creatures.Add(creature);
         }
@@ -102,9 +112,18 @@ public class Level {
         for(int i = 0, len = creatures.Count; i < len; ++i) {
             Creature creature = creatures[i];
             PathMap.Node node = map.pathToPlayer.nodes[creature.square.y, creature.square.x];
-            Debug.LogFormat("Creature found node with cost {0} in direction {1}", node.cost, node.direction.GetCharacter());
-            if(node.cost < Mathf.Infinity) {
+            Debug.LogFormat("Creature found node with cost {0} age {1} in direction {2}", node.cost, map.pathToPlayer.currentGeneration - node.generation, node.direction.GetCharacter());
+            int age = map.pathToPlayer.currentGeneration - node.generation + 1;
+            float maxCost = creature.aggressivity;
+            if(creature.inPursuit) {
+                maxCost *= 2;
+            }
+            if(node.cost <= maxCost && age < creature.memory) {
+                creature.inPursuit = true;
                 creature.square -= node.direction.deltaPosition;
+            }
+            else {
+                creature.inPursuit = false;
             }
         }
     }

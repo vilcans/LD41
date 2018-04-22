@@ -14,6 +14,8 @@ public class PathMap {
 
     private float maxCost = Mathf.Infinity;
 
+    public int currentGeneration;
+
     private struct PathItem {
         public Vector2Int square;
         public Game.Direction fromDirection;
@@ -36,6 +38,9 @@ public class PathMap {
 
         // In which direction that cost is
         public Game.Direction direction;
+
+        // At what time this direction was found
+        public int generation;
     }
 
     public Node[,] nodes;
@@ -104,6 +109,7 @@ public class PathMap {
         Node node = nodes[square.y, square.x];
         node.cost = bestCost + map.GetCost(square);
         node.direction = bestDirection.GetOpposite();
+        node.generation = currentGeneration;
         nodes[square.y, square.x] = node;
 
         UpdateAroundTile(square, node.cost);
@@ -114,13 +120,7 @@ public class PathMap {
         if(target == targetSquare) {
             return;
         }
-        for(var row = 0; row < height; ++row) {
-            for(var col = 0; col < width; ++col) {
-                Node node = nodes[row, col];
-                node.cost = Mathf.Infinity;
-                nodes[row, col] = node;
-            }
-        }
+        ++currentGeneration;
         path.Clear();
         targetSquare = target;
         path.Enqueue(new PathItem(targetSquare, Game.Direction.left, 0));
@@ -161,14 +161,16 @@ public class PathMap {
         }
 
         PathItem item = path.Dequeue();
-        float oldCost = nodes[item.square.y, item.square.x].cost;
-        if(oldCost <= item.cost) {
+        Node node = nodes[item.square.y, item.square.x];
+        float oldCost = node.cost;
+        if(node.generation == currentGeneration && oldCost <= item.cost) {
             //Debug.Log("didn't beat cost " + oldCost + " with " + item);
             return;
         }
         nodes[item.square.y, item.square.x] = new Node {
             cost = item.cost,
             direction = item.fromDirection,
+            generation = currentGeneration,
         };
         UpdateAroundTile(item.square, item.cost);
 
@@ -183,7 +185,8 @@ public class PathMap {
                 continue;
             }
             float newCost = tileCost + map.GetCost(newSq);
-            if(newCost < maxCost && nodes[newSq.y, newSq.x].cost > newCost) {
+            Node newNode = nodes[newSq.y, newSq.x];
+            if(newCost < maxCost && (newNode.cost > newCost || newNode.generation < currentGeneration)) {
                 PathItem newItem = new PathItem(newSq, direction, newCost);
                 path.Enqueue(newItem);
             }

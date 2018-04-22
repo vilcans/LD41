@@ -29,6 +29,8 @@ public class Game : MonoBehaviour {
 
     private Level level;
 
+    private const float maxPathCost = 30;
+
     private enum State {
         EnteringLevel,
         Playing,
@@ -249,7 +251,7 @@ public class Game : MonoBehaviour {
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, position + cameraOffset, ref cameraVelocity, 1.0f);
         visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beatFraction + 1));
 
-        level.map.pathToPlayer.StartSearch(playerPosition, 10.0f);
+        level.map.pathToPlayer.StartSearch(playerPosition, maxPathCost);
         level.map.pathToPlayer.Tick();
     }
 
