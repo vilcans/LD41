@@ -109,9 +109,9 @@ public class Game : MonoBehaviour {
             messageTexts[i].transform.position += new Vector3(0, -28 * i, 0);
         }
 
-        AddMessage("XWelcome to Rhythm Rogue");
-        //AddMessage("Press space to move.");
-        //AddMessage("Feel the rhythm and stay focused!");
+        AddMessage("Welcome to Rhythm Rogue");
+        AddMessage("Press space to move.");
+        AddMessage("Feel the rhythm and stay focused!");
 
         samplesPerBeat = music.clip.frequency * 60 / bpm;
         NewLevel();
@@ -379,7 +379,7 @@ public class Game : MonoBehaviour {
             messageTexts[i].text = messages[i];
         }
         for(; i < maxLines; ++i) {
-            messageTexts[i].text = ">";
+            messageTexts[i].text = "";
         }
     }
 
