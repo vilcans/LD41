@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 public class TileMap {
-    public const int width = 80;
-    public const int height = 48;
+    public const int width = 40;
+    public const int height = 24;
     private const int border = 1;
 
     public Vector2Int entryPoint;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -15,7 +16,14 @@ public class Game : MonoBehaviour {
     public Gradient arrowColors;
     public Gradient arrowColorsNoMove;
 
-    public Level level;
+    public Sprite bedrockPrefab;
+    public Sprite floorPrefab;
+    public Sprite rockPrefab;
+    public Sprite exitPrefab;
+
+    private Transform tilesParent;
+
+    private Level level;
 
     private enum State {
         EnteringLevel,
@@ -78,10 +86,57 @@ public class Game : MonoBehaviour {
     }
 
     public void NewLevel() {
+        level = new Level();
         level.Create();
+
+        int numberOfTiles = TileMap.width * TileMap.height;
+        if(tilesParent != null) {
+            Destroy(tilesParent.gameObject);
+            tilesParent = null;
+        }
+        tilesParent = new GameObject("Level").transform;
+        tilesParent.hierarchyCapacity = Math.Max(tilesParent.hierarchyCapacity, numberOfTiles + 10);
+
+        for(int row = 0; row < TileMap.height; ++row) {
+            for(int column = 0; column < TileMap.width; ++column) {
+                Vector2Int square = new Vector2Int(column, row);
+                TileMap.Tile tile = level.map.GetTile(square);
+                CreateTile(tile, square);
+            }
+        }
+
         playerPosition = level.map.entryPoint;
         cameraTransform.position = GridToWorldPosition(playerPosition) + cameraOffset;
         state = State.EnteringLevel;
+    }
+
+    private GameObject CreateTile(TileMap.Tile tile, Vector2Int square) {
+        GameObject obj = new GameObject("Tile" + square);
+        Transform t = obj.transform;
+        t.SetParent(tilesParent);
+        t.localPosition = Game.GridToWorldPosition(square) + Vector3.forward;
+        obj.isStatic = true;
+
+        Sprite sprite;
+        switch(tile) {
+            case TileMap.Tile.Bedrock:
+                sprite = bedrockPrefab;
+                break;
+            case TileMap.Tile.Floor:
+                sprite = floorPrefab;
+                break;
+            case TileMap.Tile.Rock:
+                sprite = rockPrefab;
+                break;
+            case TileMap.Tile.Exit:
+                sprite = exitPrefab;
+                break;
+            default:
+                throw new ApplicationException("Unhandled tile type: " + tile);
+        }
+        SpriteRenderer r = obj.AddComponent<SpriteRenderer>();
+        r.sprite = sprite;
+        return obj;
     }
 
     public void Update() {
