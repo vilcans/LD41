@@ -123,29 +123,6 @@ public class Level {
         return true;
     }
 
-    public void TickBeat() {
-        for(int i = 0, len = creatures.Count; i < len; ++i) {
-            Creature creature = creatures[i];
-            PathMap.Node node = map.pathToPlayer.nodes[creature.square.y, creature.square.x];
-            Debug.LogFormat("Creature found node with cost {0} age {1} in direction {2}", node.cost, map.pathToPlayer.currentGeneration - node.generation, node.direction.GetCharacter());
-            int age = map.pathToPlayer.currentGeneration - node.generation + 1;
-            float maxCost = creature.aggressivity;
-            if(creature.inPursuit) {
-                maxCost *= 2;
-            }
-            if(node.cost <= maxCost && age < creature.memory) {
-                Vector2Int targetSquare = creature.square - node.direction.deltaPosition;
-                if(map.GetTile(targetSquare) == TileMap.Tile.Floor) {
-                    creature.inPursuit = true;
-                    creature.square = targetSquare;
-                }
-            }
-            else {
-                creature.inPursuit = false;
-            }
-        }
-    }
-
 #if UNITY_EDITOR
     public void DebugDraw() {
         for(int i = 0, len = creatures.Count; i < len; ++i) {

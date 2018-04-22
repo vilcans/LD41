@@ -194,18 +194,7 @@ public class Game : MonoBehaviour {
         beatFraction = beatWithFraction - Mathf.Floor(beatWithFraction);
         if(beatFraction < previousFraction) {
             ++beatNumber;
-            level.TickBeat();
-
-            for(int i = 0, len = level.creatures.Count; i < len; ++i) {
-                Level.Creature creature = level.creatures[i];
-                if(creature.gameObject == null) {
-                    creature.gameObject = new GameObject("Creature");
-                    creature.transform = creature.gameObject.transform;
-                    SpriteRenderer spriteRenderer = creature.gameObject.AddComponent<SpriteRenderer>();
-                    spriteRenderer.sprite = creatureSprite;
-                }
-                creature.transform.position = GridToWorldPosition(creature.square);
-            }
+            TickBeat();
         }
 
         int roundedBeat = (int)(beatNumber + beatFraction + .1f);
@@ -281,6 +270,42 @@ public class Game : MonoBehaviour {
     public static Vector3 GridToWorldPosition(Vector2Int p) {
         return new Vector3(p.x, p.y, 0);
     }
+
+    private void TickBeat() {
+        TileMap map = level.map;
+        for(int i = 0, len = level.creatures.Count; i < len; ++i) {
+            Level.Creature creature = level.creatures[i];
+            PathMap.Node node = map.pathToPlayer.nodes[creature.square.y, creature.square.x];
+            Debug.LogFormat("Creature found node with cost {0} age {1} in direction {2}", node.cost, map.pathToPlayer.currentGeneration - node.generation, node.direction.GetCharacter());
+            int age = map.pathToPlayer.currentGeneration - node.generation + 1;
+            float maxCost = creature.aggressivity;
+            if(creature.inPursuit) {
+                maxCost *= 2;
+            }
+            if(node.cost <= maxCost && age < creature.memory) {
+                Vector2Int targetSquare = creature.square - node.direction.deltaPosition;
+                if(map.GetTile(targetSquare) == TileMap.Tile.Floor) {
+                    creature.inPursuit = true;
+                    creature.square = targetSquare;
+                }
+            }
+            else {
+                creature.inPursuit = false;
+            }
+        }
+
+        for(int i = 0, len = level.creatures.Count; i < len; ++i) {
+            Level.Creature creature = level.creatures[i];
+            if(creature.gameObject == null) {
+                creature.gameObject = new GameObject("Creature");
+                creature.transform = creature.gameObject.transform;
+                SpriteRenderer spriteRenderer = creature.gameObject.AddComponent<SpriteRenderer>();
+                spriteRenderer.sprite = creatureSprite;
+            }
+            creature.transform.position = GridToWorldPosition(creature.square);
+        }
+    }
+
 
     private void AddHunger(int points) {
         hunger += points;
