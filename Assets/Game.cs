@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour {
 
@@ -15,6 +15,8 @@ public class Game : MonoBehaviour {
     public SpriteRenderer arrowSprite;
     public Gradient arrowColors;
     public Gradient arrowColorsNoMove;
+
+    public Text statusText;
 
     public Sprite bedrockPrefab;
     public Sprite floorPrefab;
@@ -90,6 +92,8 @@ public class Game : MonoBehaviour {
     public void NewLevel() {
         ++dungeonLevel;
         level = new Level(dungeonLevel);
+
+        UpdateStatusText();
 
         int numberOfTiles = level.map.width * level.map.height;
         if(tilesParent != null) {
@@ -211,5 +215,9 @@ public class Game : MonoBehaviour {
 
     public static Vector3 GridToWorldPosition(Vector2Int p) {
         return new Vector3(p.x, p.y, 0);
+    }
+
+    private void UpdateStatusText() {
+        statusText.text = "Dlvl: " + dungeonLevel;
     }
 }
