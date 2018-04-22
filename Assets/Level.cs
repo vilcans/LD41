@@ -72,10 +72,12 @@ public class Level {
         }
 
         int numberOfCreatures;
-        /*if(level < 2) {
+        if(depth < 2) {
             numberOfCreatures = 0;
-        }*/
-        numberOfCreatures = 1;
+        }
+        else {
+            numberOfCreatures = Random.Range(depth / 8, Mathf.Min(depth / 2, 10));
+        }
 
         Debug.LogFormat("Iterations={0}", iterations);
         map = TileMap.Generate(
