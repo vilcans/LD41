@@ -36,7 +36,17 @@ public class Level {
             height /= 2;
         }
 
+        float[,] neighborWeights = TileMap.standardWeights;
+        if(depth > 3 && Random.value < .25f) {
+            Debug.Log("Stripes!");
+            neighborWeights = Random.value < .5 ? TileMap.verticalStripesWeights :TileMap.horizontalStripesWeights;
+        }
+
         Debug.LogFormat("Iterations={0}", iterations);
-        map = TileMap.Generate(new Vector2Int(width, height), iterations);
+        map = TileMap.Generate(
+            new Vector2Int(width, height),
+            iterations,
+            neighborWeights
+        );
     }
 }

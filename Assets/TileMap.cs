@@ -21,31 +21,29 @@ public class TileMap {
 
     private Tile[,] tiles;
 
-    private static float[,] neighborWeights = new float[3, 3] {
+    public static readonly float[,] standardWeights = NormalizeWeights(new float[3, 3] {
         { 1, 2, 1 },
         { 2, 0, 2 },
         { 1, 2, 1 },
-    };
+    });
+    public static readonly float[,] verticalStripesWeights = NormalizeWeights(new float[3, 3] {
+        { 1, 0, 1 },
+        { 1, 0, 1 },
+        { 1, 0, 1 },
+    });
+    public static readonly float[,] horizontalStripesWeights = NormalizeWeights(new float[3, 3] {
+        { 1, 1, 1 },
+        { 0, 0, 0 },
+        { 1, 1, 1 },
+    });
 
-    static TileMap() {
-        float total = 0;
-        int size = neighborWeights.GetLength(0);
-        for(int row = 0; row < size; ++row) {
-            for(int col = 0; col < size; ++col) {
-                total += neighborWeights[row, col];
-            }
-        }
-        for(int row = 0; row < size; ++row) {
-            for(int col = 0; col < size; ++col) {
-                neighborWeights[row, col] /= total;
-            }
-        }
-    }
+    private readonly float[,] neighborWeights;
 
-    private TileMap(Vector2Int size) {
+    private TileMap(Vector2Int size, float[,] weights) {
         width = size.x;
         height = size.y;
         tiles = new Tile[height, width];
+        neighborWeights = weights;
     }
 
     public Tile GetTile(Vector2Int square) {
@@ -62,11 +60,13 @@ public class TileMap {
 
     public static TileMap Generate(
         Vector2Int size,
-        int refinementIterations
+        int refinementIterations,
+        float[,] weights
     ) {
         int width = size.x;
         int height = size.y;
-        TileMap map = new TileMap(size);
+
+        TileMap map = new TileMap(size, weights);
 
         for(int row = 0; row < map.height; ++row) {
             for(int column = 0; column < width; ++column) {
@@ -81,7 +81,7 @@ public class TileMap {
             }
         }
 
-        TileMap nextGeneration = new TileMap(size);
+        TileMap nextGeneration = new TileMap(size, weights);
         for(int generation = 0; generation < refinementIterations; ++generation) {
             for(int row = 0; row < height; ++row) {
                 for(int column = 0; column < width; ++column) {
@@ -227,5 +227,22 @@ public class TileMap {
             }
         }
         return weight;
+    }
+
+    private static float[,] NormalizeWeights(float[,] weights) {
+        float total = 0;
+        int size = weights.GetLength(0);
+        for(int row = 0; row < size; ++row) {
+            for(int col = 0; col < size; ++col) {
+                total += weights[row, col];
+            }
+        }
+        float[,] result = new float[size, size];
+        for(int row = 0; row < size; ++row) {
+            for(int col = 0; col < size; ++col) {
+                result[row, col] = weights[row, col] / total;
+            }
+        }
+        return result;
     }
 }
