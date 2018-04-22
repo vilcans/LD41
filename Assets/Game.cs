@@ -89,7 +89,7 @@ public class Game : MonoBehaviour {
     private int beatNumber;
     private float beatFraction;
     private int nextPossibleStepBeat = 0;
-    private int lastMoveDirection = 0;
+    private int nextMoveDirection = 0;
     private int indexOffset;
 
     private int dungeonLevel = 0;
@@ -215,16 +215,16 @@ public class Game : MonoBehaviour {
         }
 
         int roundedBeat = (int)(beatNumber + beatFraction + .1f);
-        int movementIndex = (roundedBeat - nextPossibleStepBeat + lastMoveDirection + 4) % 4;
+        int movementIndex = (roundedBeat - nextPossibleStepBeat + nextMoveDirection + 4) % 4;
 
         Direction direction = Direction.directions[movementIndex];
 
         if(beatNumber >= nextPossibleStepBeat) {
             float r = Mathf.Pow(beatFraction, 7);
-            rotator.rotation = Quaternion.AngleAxis((beatNumber - nextPossibleStepBeat + lastMoveDirection + r) * -90, Vector3.forward);
+            rotator.rotation = Quaternion.AngleAxis((beatNumber - nextPossibleStepBeat + nextMoveDirection + r) * -90, Vector3.forward);
         }
         else {
-            rotator.rotation = Quaternion.AngleAxis(lastMoveDirection * -90, Vector3.forward);
+            rotator.rotation = Quaternion.AngleAxis(nextMoveDirection * -90, Vector3.forward);
         }
 
         bool isReady = roundedBeat >= nextPossibleStepBeat;
@@ -265,13 +265,15 @@ public class Game : MonoBehaviour {
             if(beatFraction <= .2f || beatFraction >= .9f) {
                 AddHunger(1);
                 nextPossibleStepBeat = roundedBeat + 1;
+                nextMoveDirection = movementIndex;
             }
             else {
                 outOfSyncSound.Play();
                 AddHunger(5);
-                nextPossibleStepBeat = roundedBeat + 2;
+                nextPossibleStepBeat = roundedBeat + 1;
+                AddMessage("You missed a beat and slipped!");
+                nextMoveDirection = UnityEngine.Random.Range(0, 4);
             }
-            lastMoveDirection = movementIndex;
         }
 
         Vector3 position = GridToWorldPosition(playerPosition);
