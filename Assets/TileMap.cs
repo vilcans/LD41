@@ -60,7 +60,10 @@ public class TileMap {
         tiles[square.y, square.x] = tile;
     }
 
-    public static TileMap Generate(Vector2Int size) {
+    public static TileMap Generate(
+        Vector2Int size,
+        int refinementIterations
+    ) {
         int width = size.x;
         int height = size.y;
         TileMap map = new TileMap(size);
@@ -79,7 +82,7 @@ public class TileMap {
         }
 
         TileMap nextGeneration = new TileMap(size);
-        for(int generation = 0; generation < 4; ++generation) {
+        for(int generation = 0; generation < refinementIterations; ++generation) {
             for(int row = 0; row < height; ++row) {
                 for(int column = 0; column < width; ++column) {
                     Tile tile = map.tiles[row, column];
