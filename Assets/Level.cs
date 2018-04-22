@@ -132,8 +132,11 @@ public class Level {
                 maxCost *= 2;
             }
             if(node.cost <= maxCost && age < creature.memory) {
-                creature.inPursuit = true;
-                creature.square -= node.direction.deltaPosition;
+                Vector2Int targetSquare = creature.square - node.direction.deltaPosition;
+                if(map.GetTile(targetSquare) == TileMap.Tile.Floor) {
+                    creature.inPursuit = true;
+                    creature.square = targetSquare;
+                }
             }
             else {
                 creature.inPursuit = false;
