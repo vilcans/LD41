@@ -91,7 +91,7 @@ public class Game : MonoBehaviour {
 
     private int dungeonLevel = 0;
     private int hunger = 0;
-    private int maxHunger = 100;
+    private int maxHunger = 500;
     private int maxHitpoints = 20;
     private int hitPoints = 20;
 
