@@ -180,6 +180,7 @@ public class Game : MonoBehaviour {
         beatFraction = beatWithFraction - Mathf.Floor(beatWithFraction);
         if(beatFraction < previousFraction) {
             ++beatNumber;
+            level.TickBeat();
         }
 
         int roundedBeat = (int)(beatNumber + beatFraction + .1f);

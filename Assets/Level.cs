@@ -98,6 +98,17 @@ public class Level {
         }
     }
 
+    public void TickBeat() {
+        for(int i = 0, len = creatures.Count; i < len; ++i) {
+            Creature creature = creatures[i];
+            PathMap.Node node = map.pathToPlayer.nodes[creature.square.y, creature.square.x];
+            Debug.LogFormat("Creature found node with cost {0} in direction {1}", node.cost, node.direction.GetCharacter());
+            if(node.cost < Mathf.Infinity) {
+                creature.square -= node.direction.deltaPosition;
+            }
+        }
+    }
+
 #if UNITY_EDITOR
     public void DebugDraw() {
         for(int i = 0, len = creatures.Count; i < len; ++i) {
