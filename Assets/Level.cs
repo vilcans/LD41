@@ -49,9 +49,12 @@ public class Level {
 
     public List<Creature> creatures;
 
+    private int dungeonLevel;
+
     public Level(int depth) {
 
         //Random.InitState(depth);
+        dungeonLevel = depth;
 
         bool small = depth < 5;
 
@@ -143,11 +146,13 @@ public class Level {
                 square = map.GetRandomSquare();
             } while(!IsFree(square));
 
+            bool badass = (Random.value < (dungeonLevel - 4) * .10f);
             Creature creature = new Creature {
                 square = square,
-                aggressivity = 10,
+                aggressivity = badass ? 20 : 10,
                 memory = 5,
                 name = "Ghost",
+                hitPoints = badass ? 15 : 5
             };
             creatures.Add(creature);
         }
