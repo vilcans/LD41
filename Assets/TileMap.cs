@@ -10,6 +10,8 @@ public class TileMap {
     public Vector2Int entryPoint;
     public Vector2Int exitPoint;
 
+    private static int? seed;
+
     [Flags]
     public enum Tile : byte {
         Bedrock = 1,
@@ -58,6 +60,10 @@ public class TileMap {
     }
 
     public static TileMap Generate() {
+        if(seed.HasValue) {
+            UnityEngine.Random.InitState(seed.Value);
+            seed = seed.Value + 1;
+        }
         TileMap map = new TileMap();
 
         for(int row = 0; row < height; ++row) {
