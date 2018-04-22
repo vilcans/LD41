@@ -154,7 +154,7 @@ public class Level {
     }
 
     private bool IsFree(Vector2Int square) {
-        if(map.GetTile(square) != TileMap.Tile.Floor) {
+        if(!map.IsWalkable(square)) {
             return false;
         }
         return FindCreature(square) == null;

@@ -221,7 +221,7 @@ public class Game : MonoBehaviour {
 
         Vector2Int moveDestination = playerPosition + direction.deltaPosition;
         TileMap.Tile destinationTile = level.map.GetTile(moveDestination);
-        bool canMove = isReady && ((destinationTile & (TileMap.Tile.Floor | TileMap.Tile.Exit)) != 0);
+        bool canMove = isReady && TileMap.IsWalkable(destinationTile);
 
 #if UNITY_EDITOR
         if(Input.GetKeyDown(KeyCode.RightArrow)) {
@@ -276,10 +276,14 @@ public class Game : MonoBehaviour {
                 }
                 else {
                     outOfSyncSound.Play();
-                    AddHunger(5);
+                    AddHunger(3);
                     nextPossibleStepBeat = roundedBeat + 1;
                     AddMessage("You missed a beat and slipped!");
                     nextMoveDirection = UnityEngine.Random.Range(0, 4);
+                }
+                if(destinationTile == TileMap.Tile.Food) {
+                    Eat();
+                    //ChangeTile(destinationTile, TileMap.Tile.Floor);
                 }
             }
         }
@@ -291,6 +295,22 @@ public class Game : MonoBehaviour {
 
         level.map.pathToPlayer.StartSearch(playerPosition, maxPathCost);
         level.map.pathToPlayer.Tick();
+    }
+
+    private void Eat() {
+        if(UnityEngine.Random.value < .5f) {
+            AddMessage("You eat a fortune cookie.");
+            AddMessage("There is a piece of paper inside it. Unfortunately it is blank.");
+            RemoveHunger(5);
+        }
+        else if(UnityEngine.Random.value < .5f) {
+            AddMessage("You eat an egg.");
+            RemoveHunger(10);
+        }
+        else {
+            AddMessage("You eat a food ration.");
+            RemoveHunger(50);
+        }
     }
 
     public static Vector3 GridToWorldPosition(Vector2Int p) {
@@ -363,6 +383,15 @@ public class Game : MonoBehaviour {
             if(hunger >= 40 && oldHunger / 20 != hunger / 20) {
                 AddMessage("You are hungry");
             }
+        }
+        UpdateStatusText();
+    }
+
+    private void RemoveHunger(int points) {
+        int oldHunger = hunger;
+        hunger = Math.Max(0, hunger - points);
+        if(oldHunger != 0 && hunger == 0) {
+            AddMessage("You are no longer hungry.");
         }
         UpdateStatusText();
     }

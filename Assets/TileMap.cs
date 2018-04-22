@@ -152,6 +152,17 @@ public class TileMap {
         return new Vector2Int(UnityEngine.Random.Range(border, width - border), UnityEngine.Random.Range(border, height - border));
     }
 
+    public bool IsWalkable(Vector2Int square) {
+        if(!IsInBounds(square)) {
+            return false;
+        }
+        return IsWalkable(GetTile(square));
+    }
+
+    public static bool IsWalkable(Tile tile) {
+        return (tile & (Tile.Food | Tile.Floor | Tile.Exit)) != 0;
+    }
+
     public float GetCost(Vector2Int square) {
         Tile t = GetTile(square);
         switch(t) {
