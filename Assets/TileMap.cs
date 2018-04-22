@@ -19,6 +19,7 @@ public class TileMap {
         Rock = 2,
         Floor = 4,
         Exit = 8,
+        Food = 16,
     }
 
     private Tile[,] tiles;
@@ -77,7 +78,8 @@ public class TileMap {
     public static TileMap Generate(
         Vector2Int size,
         int refinementIterations,
-        float[,] weights
+        float[,] weights,
+        int foodDrops
     ) {
         int width = size.x;
         int height = size.y;
@@ -128,7 +130,26 @@ public class TileMap {
 
         map.CreateEntryAndExit();
 
+        // Drop food
+        {
+            int tries = foodDrops * 20;
+            while(tries > 0 && foodDrops > 0) {
+                Vector2Int square = map.GetRandomSquare();
+                if(map.GetTile(square) == Tile.Floor) {
+                    map.SetTile(square, Tile.Food);
+                    --foodDrops;
+                }
+                else {
+                    --tries;
+                }
+            }
+        }
+
         return map;
+    }
+
+    public Vector2Int GetRandomSquare() {
+        return new Vector2Int(UnityEngine.Random.Range(border, width - border), UnityEngine.Random.Range(border, height - border));
     }
 
     public float GetCost(Vector2Int square) {

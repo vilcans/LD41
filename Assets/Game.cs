@@ -21,10 +21,7 @@ public class Game : MonoBehaviour {
     public Text statusText;
     public Text messageText;
 
-    public Sprite bedrockPrefab;
-    public Sprite floorPrefab;
-    public Sprite rockPrefab;
-    public Sprite exitPrefab;
+    private Dictionary<string, Sprite> spriteResources = new Dictionary<string, Sprite>();
 
     public Sprite creatureSprite;
 
@@ -159,23 +156,7 @@ public class Game : MonoBehaviour {
         t.localPosition = Game.GridToWorldPosition(square) + Vector3.forward;
         obj.isStatic = true;
 
-        Sprite sprite;
-        switch(tile) {
-            case TileMap.Tile.Bedrock:
-                sprite = bedrockPrefab;
-                break;
-            case TileMap.Tile.Floor:
-                sprite = floorPrefab;
-                break;
-            case TileMap.Tile.Rock:
-                sprite = rockPrefab;
-                break;
-            case TileMap.Tile.Exit:
-                sprite = exitPrefab;
-                break;
-            default:
-                throw new ApplicationException("Unhandled tile type: " + tile);
-        }
+        Sprite sprite = GetSprite("Tiles/" + tile.ToString());
         SpriteRenderer r = obj.AddComponent<SpriteRenderer>();
         r.sprite = sprite;
         return obj;
@@ -418,5 +399,16 @@ public class Game : MonoBehaviour {
 
     private void UpdateStatusText() {
         statusText.text = "Dlvl:" + dungeonLevel + " HP:" + hitPoints + "(" + maxHitpoints + ") Hunger:" + hunger + "(" + maxHunger + ")";
+    }
+
+    public Sprite GetSprite(string name) {
+        Sprite spr;
+        if(spriteResources.TryGetValue(name, out spr)) {
+            return spr;
+        }
+        spr = Resources.Load<Sprite>(name);
+        Assert.IsNotNull(spr, "Could not load " + name);
+        spriteResources[name] = spr;
+        return spr;
     }
 }

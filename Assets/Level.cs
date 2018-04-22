@@ -110,11 +110,20 @@ public class Level {
             numberOfCreatures = Random.Range(1 + depth / 8, depth / 2);
         }
 
+        int foodDrops;
+        if(depth == 1) {
+            foodDrops = 1;
+        }
+        else {
+            foodDrops = 2;
+        }
+
         Debug.LogFormat("Iterations={0}", iterations);
         map = TileMap.Generate(
             new Vector2Int(width, height),
             iterations,
-            neighborWeights
+            neighborWeights,
+            foodDrops
         );
 
         creatures = new List<Creature>(numberOfCreatures);
@@ -131,7 +140,7 @@ public class Level {
                     Debug.Log("Could not spawn all creatures: no space found");
                     return;
                 }
-                square = new Vector2Int(Random.Range(TileMap.border, map.width - TileMap.border), Random.Range(TileMap.border, map.height - TileMap.border));
+                square = map.GetRandomSquare();
             } while(!IsFree(square));
 
             Creature creature = new Creature {
