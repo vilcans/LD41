@@ -6,6 +6,7 @@ public class Level {
     public class Creature {
         public Vector2Int square;
         public GameObject gameObject;
+        public Transform transform;
 
         // If the cost for going to the player is less than this, will attack
         public float aggressivity;

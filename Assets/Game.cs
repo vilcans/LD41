@@ -25,6 +25,8 @@ public class Game : MonoBehaviour {
     public Sprite rockPrefab;
     public Sprite exitPrefab;
 
+    public Sprite creatureSprite;
+
     private Transform tilesParent;
 
     private Level level;
@@ -183,6 +185,17 @@ public class Game : MonoBehaviour {
         if(beatFraction < previousFraction) {
             ++beatNumber;
             level.TickBeat();
+
+            for(int i = 0, len = level.creatures.Count; i < len; ++i) {
+                Level.Creature creature = level.creatures[i];
+                if(creature.gameObject == null) {
+                    creature.gameObject = new GameObject("Creature");
+                    creature.transform = creature.gameObject.transform;
+                    SpriteRenderer spriteRenderer = creature.gameObject.AddComponent<SpriteRenderer>();
+                    spriteRenderer.sprite = creatureSprite;
+                }
+                creature.transform.position = GridToWorldPosition(creature.square);
+            }
         }
 
         int roundedBeat = (int)(beatNumber + beatFraction + .1f);
