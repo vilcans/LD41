@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -32,6 +33,10 @@ public class Game : MonoBehaviour {
     private Level level;
 
     private const float maxPathCost = 30;
+
+    private const int maxLines = 3;
+    private Text[] messageTexts;
+    private List<string> messages = new List<string>();
 
     private enum State {
         EnteringLevel,
@@ -95,6 +100,18 @@ public class Game : MonoBehaviour {
 
     public void Awake() {
         cameraTransform = Camera.main.transform;
+
+        messageTexts = new Text[maxLines];
+        messageTexts[0] = messageText;
+        messageText.text = "";
+        for(int i = 1; i < maxLines; ++i) {
+            messageTexts[i] = Instantiate(messageText, messageText.transform.parent);
+            messageTexts[i].transform.position += new Vector3(0, -28 * i, 0);
+        }
+
+        AddMessage("XWelcome to Rhythm Rogue");
+        //AddMessage("Press space to move.");
+        //AddMessage("Feel the rhythm and stay focused!");
 
         samplesPerBeat = music.clip.frequency * 60 / bpm;
         NewLevel();
@@ -243,7 +260,6 @@ public class Game : MonoBehaviour {
 #endif
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
-            messageText.text = "";
             playerPosition += direction.deltaPosition;
             moveSound.Play();
             if(beatFraction <= .2f || beatFraction >= .9f) {
@@ -346,7 +362,18 @@ public class Game : MonoBehaviour {
     }
 
     private void AddMessage(string text) {
-        messageText.text += text + "\n";
+        while(messages.Count > maxLines - 1) {
+            messages.RemoveAt(0);
+        }
+        messages.Add(text);
+        int numberOfLines = messages.Count;
+        int i;
+        for(i = 0; i < numberOfLines; ++i) {
+            messageTexts[i].text = messages[i];
+        }
+        for(; i < maxLines; ++i) {
+            messageTexts[i].text = ">";
+        }
     }
 
     private void UpdateStatusText() {

@@ -292,6 +292,7 @@ MonoBehaviour:
   floorPrefab: {fileID: 21300000, guid: 489fad41270c01c4683bb1f8f20e42a4, type: 3}
   rockPrefab: {fileID: 21300000, guid: e8cdade690977324dadd3afd4a60c1bc, type: 3}
   exitPrefab: {fileID: 21300000, guid: 88a9736addffb9a468aa9e14bbfa75f5, type: 3}
+  creatureSprite: {fileID: 21300000, guid: 078a21e9e80a2854997fbc5e2403818e, type: 3}
 --- !u!1 &364531603
 GameObject:
   m_ObjectHideFlags: 0
