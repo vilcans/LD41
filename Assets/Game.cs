@@ -194,7 +194,7 @@ public class Game : MonoBehaviour {
         beatFraction = beatWithFraction - Mathf.Floor(beatWithFraction);
         if(beatFraction < previousFraction) {
             ++beatNumber;
-            TickBeat();
+            TickBeat(beatNumber);
         }
 
         int roundedBeat = (int)(beatNumber + beatFraction + .1f);
@@ -271,12 +271,15 @@ public class Game : MonoBehaviour {
         return new Vector3(p.x, p.y, 0);
     }
 
-    private void TickBeat() {
+    private void TickBeat(int beatNumber) {
         TileMap map = level.map;
         for(int i = 0, len = level.creatures.Count; i < len; ++i) {
+            if(beatNumber % 4 != i % 4) {
+                continue;
+            }
             Level.Creature creature = level.creatures[i];
             PathMap.Node node = map.pathToPlayer.nodes[creature.square.y, creature.square.x];
-            Debug.LogFormat("Creature found node with cost {0} age {1} in direction {2}", node.cost, map.pathToPlayer.currentGeneration - node.generation, node.direction.GetCharacter());
+            //Debug.LogFormat("Creature found node with cost {0} age {1} in direction {2}", node.cost, map.pathToPlayer.currentGeneration - node.generation, node.direction.GetCharacter());
             int age = map.pathToPlayer.currentGeneration - node.generation + 1;
             float maxCost = creature.aggressivity;
             if(creature.inPursuit) {
