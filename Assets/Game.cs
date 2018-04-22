@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Game : MonoBehaviour {
@@ -17,6 +18,7 @@ public class Game : MonoBehaviour {
     public Gradient arrowColorsNoMove;
 
     public Text statusText;
+    public Text messageText;
 
     public Sprite bedrockPrefab;
     public Sprite floorPrefab;
@@ -30,6 +32,7 @@ public class Game : MonoBehaviour {
     private enum State {
         EnteringLevel,
         Playing,
+        Dead,
     }
     private State state;
 
@@ -81,6 +84,10 @@ public class Game : MonoBehaviour {
     private int indexOffset;
 
     private int dungeonLevel = 0;
+    private int hunger = 0;
+    private int maxHunger = 10;
+    private int maxHitpoints = 20;
+    private int hitPoints = 20;
 
     public void Awake() {
         cameraTransform = Camera.main.transform;
@@ -146,8 +153,15 @@ public class Game : MonoBehaviour {
     }
 
     public void Update() {
+        if(Input.GetKeyDown(KeyCode.R)) {
+            SceneManager.LoadScene("Main");
+        }
+
         if(state == State.EnteringLevel) {
             state = State.Playing;
+            return;
+        }
+        if(state != State.Playing) {
             return;
         }
 
@@ -195,13 +209,16 @@ public class Game : MonoBehaviour {
         bool canMove = isReady && ((destinationTile & (TileMap.Tile.Floor | TileMap.Tile.Exit)) != 0);
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
+            messageText.text = "";
             playerPosition += direction.deltaPosition;
             moveSound.Play();
             if(beatFraction <= .2f || beatFraction >= .9f) {
+                AddHunger(1);
                 nextPossibleStepBeat = roundedBeat + 1;
             }
             else {
                 outOfSyncSound.Play();
+                AddHunger(5);
                 nextPossibleStepBeat = roundedBeat + 2;
             }
             lastMoveDirection = movementIndex;
@@ -217,7 +234,31 @@ public class Game : MonoBehaviour {
         return new Vector3(p.x, p.y, 0);
     }
 
+    private void AddHunger(int points) {
+        hunger += points;
+        if(hunger > maxHunger) {
+            AddDamage(hunger - maxHunger, "starvation");
+            hunger = maxHunger;
+        }
+        UpdateStatusText();
+    }
+
+    private void AddDamage(int hit, string cause) {
+        hitPoints -= hit;
+        if(hitPoints <= 0) {
+            hitPoints = 0;
+            UpdateStatusText();
+            state = State.Dead;
+            AddMessage("You were killed by " + cause);
+            AddMessage("Press R to restart");
+            music.Stop();
+        } 
+    }
+    private void AddMessage(string text) {
+        messageText.text += text + "\n";
+    }
+
     private void UpdateStatusText() {
-        statusText.text = "Dlvl: " + dungeonLevel;
+        statusText.text = "Dlvl:" + dungeonLevel + " HP:" + hitPoints + "(" + maxHitpoints + ") Hunger:" + hunger + "(" + maxHunger + ")";
     }
 }
