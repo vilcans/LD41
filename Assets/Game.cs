@@ -287,7 +287,18 @@ public class Game : MonoBehaviour {
             }
             if(node.cost <= maxCost && age < creature.memory) {
                 Vector2Int targetSquare = creature.square - node.direction.deltaPosition;
-                if(map.GetTile(targetSquare) == TileMap.Tile.Floor) {
+                if(targetSquare == playerPosition) {
+                    int damage;
+                    bool hit = creature.GetDamage(out damage);
+                    if(hit) {
+                        AddMessage(creature.name + " hits!");
+                        AddDamage(damage, creature.name);
+                    }
+                    else {
+                        AddMessage(creature.name + " misses!");
+                    }
+                }
+                else if(map.GetTile(targetSquare) == TileMap.Tile.Floor) {
                     creature.inPursuit = true;
                     creature.square = targetSquare;
                 }
@@ -328,8 +339,12 @@ public class Game : MonoBehaviour {
             AddMessage("You were killed by " + cause);
             AddMessage("Press R to restart");
             music.Stop();
-        } 
+        }
+        else {
+            UpdateStatusText();
+        }
     }
+
     private void AddMessage(string text) {
         messageText.text += text + "\n";
     }

@@ -15,6 +15,19 @@ public class Level {
         public int memory;
 
         public bool inPursuit;
+
+        public string name;
+
+        public bool GetDamage(out int damage) {
+            if(Random.value < .5f) {
+                damage = Random.Range(1, 10);
+                return true;
+            }
+            else {
+                damage = 0;
+                return false;
+            }
+        }
     }
 
     public TileMap map;
@@ -106,6 +119,7 @@ public class Level {
                 square = square,
                 aggressivity = 10,
                 memory = 5,
+                name = "Ghost",
             };
             creatures.Add(creature);
         }
