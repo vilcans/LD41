@@ -18,6 +18,8 @@ public class Level {
 
         public string name;
 
+        public int hitPoints = 5;
+
         public bool GetDamage(out int damage) {
             if(Random.value < .5f) {
                 damage = Random.Range(1, 10);
@@ -27,6 +29,19 @@ public class Level {
                 damage = 0;
                 return false;
             }
+        }
+
+        public void AddDamage(int damage) {
+            hitPoints -= damage;
+            if(hitPoints < 0) {
+                hitPoints = 0;
+            }
+        }
+
+        public void Destroy() {
+            Object.Destroy(gameObject);
+            gameObject = null;
+            transform = null;
         }
     }
 
@@ -133,12 +148,16 @@ public class Level {
         if(map.GetTile(square) != TileMap.Tile.Floor) {
             return false;
         }
+        return FindCreature(square) == null;
+    }
+
+    public Creature FindCreature(Vector2Int square) {
         for(int i = 0, len = creatures.Count; i < len; ++i) {
             if(creatures[i].square == square) {
-                return false;
+                return creatures[i];
             }
         }
-        return true;
+        return null;
     }
 
 #if UNITY_EDITOR

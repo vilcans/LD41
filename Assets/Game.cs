@@ -121,9 +121,7 @@ public class Game : MonoBehaviour {
         if(level != null) {
             for(int i = 0, len = level.creatures.Count; i < len; ++i) {
                 Level.Creature creature = level.creatures[i];
-                Destroy(creature.gameObject);
-                creature.gameObject = null;
-                creature.transform = null;
+                creature.Destroy();
             }
             level = null;
         }
@@ -260,19 +258,48 @@ public class Game : MonoBehaviour {
 #endif
 
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
-            playerPosition += direction.deltaPosition;
-            moveSound.Play();
-            if(beatFraction <= .2f || beatFraction >= .9f) {
-                AddHunger(1);
+            bool isInSync = beatFraction <= .2f || beatFraction >= .9f;
+            Vector2Int newPosition = playerPosition + direction.deltaPosition;
+            Level.Creature creature = level.FindCreature(newPosition);
+            if(creature != null) {
+                int damage;
+                if(isInSync) {
+                    damage = UnityEngine.Random.Range(1, 5);
+                    creature.AddDamage(damage);
+                    AddMessage("You hit " + creature.name);
+                }
+                else {
+                    damage = UnityEngine.Random.Range(0, 1);
+                    if(damage == 0) {
+                        AddMessage("You miss");
+                    }
+                    else {
+                        AddMessage("You hit " + creature.name + " - a glancing blow");
+                        creature.AddDamage(damage);
+                    }
+                }
+                if(creature.hitPoints == 0) {
+                    AddMessage("You killed " + creature.name + "!");
+                    RemoveCreature(creature);
+                }
                 nextPossibleStepBeat = roundedBeat + 1;
                 nextMoveDirection = movementIndex;
             }
             else {
-                outOfSyncSound.Play();
-                AddHunger(5);
-                nextPossibleStepBeat = roundedBeat + 1;
-                AddMessage("You missed a beat and slipped!");
-                nextMoveDirection = UnityEngine.Random.Range(0, 4);
+                playerPosition = newPosition;
+                moveSound.Play();
+                if(isInSync) {
+                    AddHunger(1);
+                    nextPossibleStepBeat = roundedBeat + 1;
+                    nextMoveDirection = movementIndex;
+                }
+                else {
+                    outOfSyncSound.Play();
+                    AddHunger(5);
+                    nextPossibleStepBeat = roundedBeat + 1;
+                    AddMessage("You missed a beat and slipped!");
+                    nextMoveDirection = UnityEngine.Random.Range(0, 4);
+                }
             }
         }
 
@@ -338,6 +365,10 @@ public class Game : MonoBehaviour {
         }
     }
 
+    private void RemoveCreature(Level.Creature creature) {
+        creature.Destroy();
+        level.creatures.Remove(creature);
+    }
 
     private void AddHunger(int points) {
         int oldHunger = hunger;
