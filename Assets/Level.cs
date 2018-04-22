@@ -88,8 +88,11 @@ public class Level {
         if(depth < 2) {
             numberOfCreatures = 0;
         }
+        else if(depth == 2) {
+            numberOfCreatures = 1;
+        }
         else {
-            numberOfCreatures = Random.Range(depth / 8, Mathf.Min(depth / 2, 10));
+            numberOfCreatures = Random.Range(1 + depth / 8, depth / 2);
         }
 
         Debug.LogFormat("Iterations={0}", iterations);
@@ -101,6 +104,7 @@ public class Level {
 
         creatures = new List<Creature>(numberOfCreatures);
         SpawnCreatures(numberOfCreatures);
+        Debug.LogFormat("Spawned {0} out of requested {1}", creatures.Count, numberOfCreatures);
     }
 
     private void SpawnCreatures(int numberOfCreatures) {
@@ -108,7 +112,7 @@ public class Level {
         for(int i = 0; i < numberOfCreatures; ++i) {
             Vector2Int square;
             do {
-                if(++retries > 10) {
+                if(++retries > 1000) {
                     Debug.Log("Could not spawn all creatures: no space found");
                     return;
                 }
