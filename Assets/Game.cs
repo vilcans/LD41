@@ -208,6 +208,21 @@ public class Game : MonoBehaviour {
         TileMap.Tile destinationTile = level.map.GetTile(moveDestination);
         bool canMove = isReady && ((destinationTile & (TileMap.Tile.Floor | TileMap.Tile.Exit)) != 0);
 
+#if UNITY_EDITOR
+        if(Input.GetKeyDown(KeyCode.RightArrow)) {
+            playerPosition += new Vector2Int(1, 0);
+        }
+        if(Input.GetKeyDown(KeyCode.LeftArrow)) {
+            playerPosition += new Vector2Int(-1, 0);
+        }
+        if(Input.GetKeyDown(KeyCode.UpArrow)) {
+            playerPosition += new Vector2Int(0, 1);
+        }
+        if(Input.GetKeyDown(KeyCode.DownArrow)) {
+            playerPosition += new Vector2Int(0, -1);
+        }
+#endif
+
         if(Input.GetKeyDown(KeyCode.Space) && canMove) {
             messageText.text = "";
             playerPosition += direction.deltaPosition;
