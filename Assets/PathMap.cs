@@ -8,8 +8,8 @@ public class PathMap {
 
     private Vector2Int targetSquare;
 
-    private const int height = TileMap.height;
-    private const int width = TileMap.width;
+    private int height;
+    private int width;
 
     private struct PathItem {
         public Vector2Int square;
@@ -35,10 +35,13 @@ public class PathMap {
         public Game.Direction direction;
     }
 
-    public Node[,] nodes = new Node[height, width];
+    public Node[,] nodes;
 
     public PathMap(TileMap map) {
         this.map = map;
+        height = map.height;
+        width = map.width;
+        nodes = new Node[height, width];
         Clear();
     }
 

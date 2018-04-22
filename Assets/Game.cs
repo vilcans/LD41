@@ -78,6 +78,8 @@ public class Game : MonoBehaviour {
     private int lastMoveDirection = 0;
     private int indexOffset;
 
+    private int dungeonLevel = 0;
+
     public void Awake() {
         cameraTransform = Camera.main.transform;
 
@@ -86,10 +88,10 @@ public class Game : MonoBehaviour {
     }
 
     public void NewLevel() {
-        level = new Level();
-        level.Create();
+        ++dungeonLevel;
+        level = new Level(dungeonLevel);
 
-        int numberOfTiles = TileMap.width * TileMap.height;
+        int numberOfTiles = level.map.width * level.map.height;
         if(tilesParent != null) {
             Destroy(tilesParent.gameObject);
             tilesParent = null;
@@ -97,8 +99,8 @@ public class Game : MonoBehaviour {
         tilesParent = new GameObject("Level").transform;
         tilesParent.hierarchyCapacity = Math.Max(tilesParent.hierarchyCapacity, numberOfTiles + 10);
 
-        for(int row = 0; row < TileMap.height; ++row) {
-            for(int column = 0; column < TileMap.width; ++column) {
+        for(int row = 0; row < level.map.height; ++row) {
+            for(int column = 0; column < level.map.width; ++column) {
                 Vector2Int square = new Vector2Int(column, row);
                 TileMap.Tile tile = level.map.GetTile(square);
                 CreateTile(tile, square);

@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 public class TileMap {
-    public const int width = 40;
-    public const int height = 24;
+    public readonly int width;
+    public readonly int height;
+
     private const int border = 1;
 
     public Vector2Int entryPoint;
@@ -43,7 +44,9 @@ public class TileMap {
         }
     }
 
-    private TileMap() {
+    private TileMap(Vector2Int size) {
+        width = size.x;
+        height = size.y;
         tiles = new Tile[height, width];
     }
 
@@ -59,14 +62,16 @@ public class TileMap {
         tiles[square.y, square.x] = tile;
     }
 
-    public static TileMap Generate() {
+    public static TileMap Generate(Vector2Int size) {
         if(seed.HasValue) {
             UnityEngine.Random.InitState(seed.Value);
             seed = seed.Value + 1;
         }
-        TileMap map = new TileMap();
+        int width = size.x;
+        int height = size.y;
+        TileMap map = new TileMap(size);
 
-        for(int row = 0; row < height; ++row) {
+        for(int row = 0; row < map.height; ++row) {
             for(int column = 0; column < width; ++column) {
                 Tile tile;
                 if(row < border || row >= height - border || column < border || column >= width - border) {
@@ -79,7 +84,7 @@ public class TileMap {
             }
         }
 
-        TileMap nextGeneration = new TileMap();
+        TileMap nextGeneration = new TileMap(size);
         for(int generation = 0; generation < 4; ++generation) {
             for(int row = 0; row < height; ++row) {
                 for(int column = 0; column < width; ++column) {

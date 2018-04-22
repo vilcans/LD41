@@ -1,8 +1,17 @@
-﻿public class Level {
+﻿using UnityEngine;
+
+public class Level {
 
     public TileMap map;
 
-    public void Create() {
-        map = TileMap.Generate();
+    public Level(int depth) {
+        Vector2Int size;
+        if(depth < 5) {
+            size = new Vector2Int(40, 24);
+        }
+        else {
+            size = new Vector2Int(60, 32);
+        }
+        map = TileMap.Generate(size);
     }
 }
