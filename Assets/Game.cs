@@ -101,6 +101,16 @@ public class Game : MonoBehaviour {
     }
 
     public void NewLevel() {
+        if(level != null) {
+            for(int i = 0, len = level.creatures.Count; i < len; ++i) {
+                Level.Creature creature = level.creatures[i];
+                Destroy(creature.gameObject);
+                creature.gameObject = null;
+                creature.transform = null;
+            }
+            level = null;
+        }
+
         ++dungeonLevel;
         level = new Level(dungeonLevel);
 
