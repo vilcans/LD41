@@ -36,6 +36,20 @@ public class TileMap {
         { 0, 0, 0 },
         { 1, 1, 1 },
     });
+    public static readonly float[,] horizontalCorridorWeights = NormalizeWeights(new float[5, 5] {
+        { 1, 2, 3, 2, 1 },
+        { 0, 0, 0, 0, 0 },
+        { 1, 2, 3, 2, 1 },
+        { 0, 0, 0, 0, 0 },
+        { 1, 2, 3, 2, 1 },
+    });
+    public static readonly float[,] bigHallsWeights = NormalizeWeights(new float[5, 5] {
+        { 1, 1, 1, 1, 1 },
+        { 1, 0, 0, 0, 1 },
+        { 1, 0, 0, 0, 1 },
+        { 1, 0, 0, 0, 1 },
+        { 1, 1, 1, 1, 1 },
+    });
 
     private readonly float[,] neighborWeights;
 
@@ -217,12 +231,14 @@ public class TileMap {
 
     private float CountNeighbors(Vector2Int square, Tile soughtTilesMask) {
         float weight = 0;
-        for(int y = -1; y <= 1; ++y) {
-            for(int x = -1; x <= 1; ++x) {
+        int size = neighborWeights.GetLength(0);
+        int r = size / 2;
+        for(int y = -r; y <= r; ++y) {
+            for(int x = -r; x <= r; ++x) {
                 Vector2Int p = square + new Vector2Int(x, y);
                 Tile neighbor = GetTile(p);
                 if((neighbor & soughtTilesMask) != 0) {
-                    weight += neighborWeights[y + 1, x + 1];
+                    weight += neighborWeights[y + r, x + r];
                 }
             }
         }

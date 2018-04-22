@@ -38,8 +38,20 @@ public class Level {
 
         float[,] neighborWeights = TileMap.standardWeights;
         if(depth > 3 && Random.value < .25f) {
-            Debug.Log("Stripes!");
-            neighborWeights = Random.value < .5 ? TileMap.verticalStripesWeights :TileMap.horizontalStripesWeights;
+            float random = Random.value;
+            Debug.LogFormat("Special level! random={0}", random);
+            if((random -= .1f) < 0) {
+                neighborWeights = TileMap.verticalStripesWeights;
+            }
+            else if((random -= .1f) < 0) {
+                neighborWeights = TileMap.horizontalStripesWeights;
+            }
+            else if((random -= .1f) < 0) {
+                neighborWeights = TileMap.horizontalCorridorWeights;
+            }
+            else {
+                neighborWeights = TileMap.bigHallsWeights;
+            }
         }
 
         Debug.LogFormat("Iterations={0}", iterations);
