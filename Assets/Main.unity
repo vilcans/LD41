@@ -288,10 +288,6 @@ MonoBehaviour:
     m_NumAlphaKeys: 3
   statusText: {fileID: 1768060277}
   messageText: {fileID: 1290200550}
-  bedrockPrefab: {fileID: 21300000, guid: 5cec9b205d9aeae4a82d3c7deca592d2, type: 3}
-  floorPrefab: {fileID: 21300000, guid: 489fad41270c01c4683bb1f8f20e42a4, type: 3}
-  rockPrefab: {fileID: 21300000, guid: e8cdade690977324dadd3afd4a60c1bc, type: 3}
-  exitPrefab: {fileID: 21300000, guid: 88a9736addffb9a468aa9e14bbfa75f5, type: 3}
   creatureSprite: {fileID: 21300000, guid: 078a21e9e80a2854997fbc5e2403818e, type: 3}
 --- !u!1 &364531603
 GameObject:
@@ -740,8 +736,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1979828045}
   - {fileID: 1150453573}
+  - {fileID: 1979828045}
   - {fileID: 1109457921}
   m_Father: {fileID: 356464952}
   m_RootOrder: 1
@@ -798,12 +794,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1150453572}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 987384196}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1150453574
 SpriteRenderer:
@@ -839,7 +835,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: bf8b83cc8548ebd4095bf2d3c3f7c0eb, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5a0c63c3c4ad20d4782907ede497bd2b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1182,5 +1178,5 @@ Transform:
   m_Children:
   - {fileID: 1788597500}
   m_Father: {fileID: 987384196}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

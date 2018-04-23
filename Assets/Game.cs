@@ -225,9 +225,11 @@ public class Game : MonoBehaviour {
         if(beatNumber >= nextPossibleStepBeat) {
             float r = Mathf.Pow(beatFraction, 7);
             rotator.rotation = Quaternion.AngleAxis((beatNumber - nextPossibleStepBeat + nextMoveDirection + r) * -90, Vector3.forward);
+            visualTransform.localRotation = Quaternion.AngleAxis(movementIndex * -90, Vector3.forward);
         }
         else {
             rotator.rotation = Quaternion.AngleAxis(nextMoveDirection * -90, Vector3.forward);
+            visualTransform.localRotation = Quaternion.AngleAxis(nextMoveDirection * -90, Vector3.forward);
         }
 
         bool isReady = roundedBeat >= nextPossibleStepBeat;
