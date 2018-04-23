@@ -35,6 +35,9 @@ public class Game : MonoBehaviour {
     private Text[] messageTexts;
     private List<string> messages = new List<string>();
 
+    private SpriteRenderer playerSpriteRenderer;
+    private Sprite[] playerSprites;
+
     private enum State {
         EnteringLevel,
         Playing,
@@ -97,6 +100,12 @@ public class Game : MonoBehaviour {
 
     public void Awake() {
         cameraTransform = Camera.main.transform;
+
+        playerSpriteRenderer = visualTransform.GetComponent<SpriteRenderer>();
+        playerSprites = new Sprite[3];
+        playerSprites[0] = GetSprite("Player/Player_0");
+        playerSprites[1] = GetSprite("Player/Player_1");
+        playerSprites[2] = GetSprite("Player/Player_2");
 
         messageTexts = new Text[maxLines];
         messageTexts[0] = messageText;
@@ -231,6 +240,12 @@ public class Game : MonoBehaviour {
             rotator.rotation = Quaternion.AngleAxis(nextMoveDirection * -90, Vector3.forward);
             visualTransform.localRotation = Quaternion.AngleAxis(nextMoveDirection * -90, Vector3.forward);
         }
+        {
+            float progress = (beatFraction - .5f) * 2;
+            //progress = progress * progress;
+            progress = Mathf.Abs(progress);
+            playerSpriteRenderer.sprite = playerSprites[2 - (int)(progress * 3)];
+        }
 
         bool isReady = roundedBeat >= nextPossibleStepBeat;
         if(isReady) {
@@ -317,7 +332,7 @@ public class Game : MonoBehaviour {
         Vector3 position = GridToWorldPosition(playerPosition);
         playerTransform.position = position;
         cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, position + cameraOffset, ref cameraVelocity, 1.0f);
-        visualTransform.localScale = Vector3.one * Mathf.Lerp(1.3f, 1.0f, 1.0f - 1.0f / (beatFraction + 1));
+        visualTransform.localScale = Vector3.one * Mathf.Lerp(1.0f, .70f, 1.0f - 1.0f / (beatFraction + 1));
 
         level.map.pathToPlayer.StartSearch(playerPosition, maxPathCost);
         level.map.pathToPlayer.Tick();
