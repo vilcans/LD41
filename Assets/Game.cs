@@ -156,10 +156,34 @@ public class Game : MonoBehaviour {
         t.localPosition = Game.GridToWorldPosition(square) + Vector3.forward;
         obj.isStatic = true;
 
-        Sprite sprite = GetSprite("Tiles/" + tile.ToString());
+        string resourceName;
+        if(tile == TileMap.Tile.Wall) {
+            resourceName = "Tiles/Wall_" + GetNeighborBits(square, tile);
+        }
+        else {
+            resourceName = "Tiles/" + tile.ToString();
+        }
+        Sprite sprite = GetSprite(resourceName);
         SpriteRenderer r = obj.AddComponent<SpriteRenderer>();
         r.sprite = sprite;
         return obj;
+    }
+
+    private string GetNeighborBits(Vector2Int square, TileMap.Tile tile) {
+        int value = 0;
+        for(int y = 1; y >= -1; --y) {
+            for(int x = -1; x <= 1; ++x) {
+                if(x == 0 && y == 0) {
+                    continue;
+                }
+                value <<= 1;
+                Vector2Int direction = new Vector2Int(x, y);
+                if(level.map.GetTile(square + direction) == tile) {
+                    value |= 1;
+                }
+            }
+        }
+        return Convert.ToString(value, 2).PadLeft(8, '0');
     }
 
     public void Update() {

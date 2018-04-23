@@ -16,7 +16,7 @@ public class TileMap {
     [Flags]
     public enum Tile : byte {
         Bedrock = 1,
-        Rock = 2,
+        Wall = 2,
         Floor = 4,
         Exit = 8,
         Food = 16,
@@ -65,7 +65,7 @@ public class TileMap {
 
     public Tile GetTile(Vector2Int square) {
         if(square.x < 0 || square.x >= width || square.y < 0 || square.y >= height) {
-            return Tile.Rock;
+            return Tile.Wall;
         }
         return tiles[square.y, square.x];
     }
@@ -105,7 +105,7 @@ public class TileMap {
                 for(int column = 0; column < width; ++column) {
                     Tile tile = map.tiles[row, column];
                     Vector2Int sq = new Vector2Int(column, row);
-                    if(tile == Tile.Rock && map.CountNeighbors(sq, Tile.Rock | Tile.Bedrock) < .5f) {
+                    if(tile == Tile.Wall && map.CountNeighbors(sq, Tile.Wall | Tile.Bedrock) < .5f) {
                         nextGeneration.tiles[row, column] = Tile.Floor;
                     }
                     else if(tile == Tile.Floor && map.CountNeighbors(sq, Tile.Floor) < .5f) {
@@ -113,7 +113,7 @@ public class TileMap {
                             nextGeneration.tiles[row, column] = Tile.Bedrock;
                         }
                         else {
-                            nextGeneration.tiles[row, column] = Tile.Rock;
+                            nextGeneration.tiles[row, column] = Tile.Wall;
                         }
                     }
                     else {
@@ -168,7 +168,7 @@ public class TileMap {
         switch(t) {
             case Tile.Bedrock:
                 return 1e9f;
-            case Tile.Rock:
+            case Tile.Wall:
                 return 1e6f;
             default:
                 return 1;
