@@ -254,7 +254,7 @@ public class Game : MonoBehaviour {
             float progress = (beatFraction - .5f) * 2;
             //progress = progress * progress;
             progress = Mathf.Abs(progress);
-            playerSpriteRenderer.sprite = playerSprites[2 - (int)(progress * 3)];
+            playerSpriteRenderer.sprite = playerSprites[2 - (int)(Mathf.Clamp01(progress * 3) * .999f)];
         }
 
         bool isReady = roundedBeat >= nextPossibleStepBeat;
