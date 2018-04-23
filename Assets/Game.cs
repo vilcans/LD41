@@ -178,6 +178,16 @@ public class Game : MonoBehaviour {
         return obj;
     }
 
+    private void ReplaceTile(Vector2Int square, TileMap.Tile newTile) {
+        // Oh, ugliness... finding by name
+        string name = "Tile" + square;
+        Transform oldTile = tilesParent.Find(name);
+        Assert.IsNotNull(oldTile, "Could not find tile to replace");
+        Destroy(oldTile.gameObject);
+        CreateTile(newTile, square);
+        level.map.SetTile(square, newTile);
+    }
+
     private string GetNeighborBits(Vector2Int square, TileMap.Tile tile) {
         int value = 0;
         for(int y = 1; y >= -1; --y) {
@@ -324,7 +334,7 @@ public class Game : MonoBehaviour {
                 }
                 if(destinationTile == TileMap.Tile.Food) {
                     Eat();
-                    //ChangeTile(destinationTile, TileMap.Tile.Floor);
+                    ReplaceTile(moveDestination, TileMap.Tile.Floor);
                 }
             }
         }
