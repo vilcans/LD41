@@ -98,8 +98,12 @@ public class Game : MonoBehaviour {
     private int maxHitpoints = 20;
     private int hitPoints = 20;
 
+    private Tiles tiles;
+
     public void Awake() {
         cameraTransform = Camera.main.transform;
+
+        tiles = FindObjectOfType<Tiles>();
 
         playerSpriteRenderer = visualTransform.GetComponent<SpriteRenderer>();
         playerSprites = new Sprite[3];
@@ -165,14 +169,15 @@ public class Game : MonoBehaviour {
         t.localPosition = Game.GridToWorldPosition(square) + Vector3.forward;
         obj.isStatic = true;
 
-        string resourceName;
+        Sprite sprite;
         if(tile == TileMap.Tile.Wall) {
-            resourceName = "Tiles/Walls/Wall_" + TileNumbers.numbers[GetNeighborBits(square, tile)].ToString();
+            int bits = GetNeighborBits(square, tile);
+            sprite = tiles.wallSprites[bits];
         }
         else {
-            resourceName = "Tiles/" + tile.ToString();
+            string resourceName = "Tiles/" + tile.ToString();
+            sprite = GetSprite(resourceName);
         }
-        Sprite sprite = GetSprite(resourceName);
         SpriteRenderer r = obj.AddComponent<SpriteRenderer>();
         r.sprite = sprite;
         return obj;
