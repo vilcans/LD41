@@ -167,7 +167,7 @@ public class Game : MonoBehaviour {
 
         string resourceName;
         if(tile == TileMap.Tile.Wall) {
-            resourceName = "Tiles/Wall_" + GetNeighborBits(square, tile);
+            resourceName = "Tiles/Walls/Wall_" + TileNumbers.numbers[GetNeighborBits(square, tile)].ToString();
         }
         else {
             resourceName = "Tiles/" + tile.ToString();
@@ -188,7 +188,7 @@ public class Game : MonoBehaviour {
         level.map.SetTile(square, newTile);
     }
 
-    private string GetNeighborBits(Vector2Int square, TileMap.Tile tile) {
+    private int GetNeighborBits(Vector2Int square, TileMap.Tile tile) {
         int value = 0;
         for(int y = 1; y >= -1; --y) {
             for(int x = -1; x <= 1; ++x) {
@@ -202,7 +202,7 @@ public class Game : MonoBehaviour {
                 }
             }
         }
-        return Convert.ToString(value, 2).PadLeft(8, '0');
+        return value;
     }
 
     public void Update() {
