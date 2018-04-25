@@ -19,11 +19,13 @@ $(RELEASE_DIR)/$(FILENAME)-win.zip:
 	cp -r Build/win Build/ziptemp/$(FILENAME)
 	bash -c 'cd Build/ziptemp && zip -x .DS_Store -x '*.pdb' -r ../release/$(FILENAME)-win.zip $(FILENAME)'
 
-release-mac: $(RELEASE_DIR)/$(FILENAME).dmg
+release-mac: $(RELEASE_DIR)/$(FILENAME)-mac.tar.gz
 
-$(RELEASE_DIR)/$(FILENAME).dmg:
+$(RELEASE_DIR)/$(FILENAME)-mac.tar.gz:
 	mkdir -p Build/release
-	hdiutil create $@ -volname "$(PROJECT)" -srcfolder Build/mac
+	rm -rf Build/ziptemp
+	mkdir -p Build/ziptemp
+	tar -czf $@ --exclude '.DS_Store' -C Build/mac $(FILENAME).app
 
 release-linux: $(RELEASE_DIR)/$(FILENAME)-linux.tar.gz
 
