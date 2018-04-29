@@ -22,7 +22,8 @@ $(RELEASE_DIR)/$(FILENAME)-win.zip:
 release-mac: $(RELEASE_DIR)/$(FILENAME)-mac.tar.gz
 
 $(RELEASE_DIR)/$(FILENAME)-mac.tar.gz:
-	mkdir -p Build/release
+	chmod +x Build/mac/$(FILENAME).app/Contents/MacOS/$(FILENAME)
+	mkdir -p $(RELEASE_DIR)
 	rm -rf Build/ziptemp
 	mkdir -p Build/ziptemp
 	tar -czf $@ --exclude '.DS_Store' -C Build/mac $(FILENAME).app
