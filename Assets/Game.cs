@@ -38,6 +38,8 @@ public class Game : MonoBehaviour {
     private SpriteRenderer playerSpriteRenderer;
     private Sprite[] playerSprites;
 
+    private static readonly bool debugWalls = false;
+
     private enum State {
         EnteringLevel,
         Playing,
@@ -171,8 +173,16 @@ public class Game : MonoBehaviour {
 
         Sprite sprite;
         if(tile == TileMap.Tile.Wall) {
-            int bits = GetNeighborBits(square, tile);
-            sprite = tiles.wallSprites[bits];
+            if(debugWalls) {
+                sprite = GetSprite("Tiles/WallDebug");
+            }
+            else {
+                int bits = GetNeighborBits(square, tile);
+                sprite = tiles.wallSprites[bits];
+            }
+        }
+        else if(tile == TileMap.Tile.Bedrock && debugWalls) {
+            sprite = GetSprite("Tiles/WallDebug");
         }
         else {
             string resourceName = "Tiles/" + tile.ToString();
